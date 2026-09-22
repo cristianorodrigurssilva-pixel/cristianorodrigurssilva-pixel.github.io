@@ -1,1 +1,9 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.cristianorodrigurssilva_pixel.twa",
+        "sha256_cert_fingerprints": ["DA:05:28:7A:7B:5A:F5:B2:92:25:9D:0B:E1:BF:12:17:80:00:88:44:FD:7D:22:59:CD:BB:F3:A5:BE:57:6C:78"]
+      }
+    }]
 
