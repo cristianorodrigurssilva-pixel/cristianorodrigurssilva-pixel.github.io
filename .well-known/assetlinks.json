@@ -3,7 +3,7 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.cristianorodrigurssilva_pixel.twa",
-        "sha256_cert_fingerprints": ["DA:05:28:7A:7B:5A:F5:B2:92:25:9D:0B:E1:BF:12:17:80:00:88:44:FD:7D:22:59:CD:BB:F3:A5:BE:57:6C:78"]
+        "sha256_cert_fingerprints": ["E0:1A:2B:F4:96:E4:9C:95:E7:E5:F6:BC:82:D1:61:FF:67:12:26:C3:D9:4B:AB:F4:76:3A:88:8F:B8:2E:84:19"]
       }
     }]
 
