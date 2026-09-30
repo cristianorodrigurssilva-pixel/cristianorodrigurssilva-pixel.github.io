@@ -2,13 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QrPix</title>
-    
-    <!-- Configurações para forçar o modo Aplicativo Nativo / Standalone -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -650,7 +645,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
-// --- FUNÇÃO LIMPA DO WHATSAPP COM CRASES TRIPLAS ---
+// --- FUNÇÃO LIMPA DO WHATSAPP ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -676,7 +671,7 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // 3. Monta o resumo limpo com o bloco de código ativado (crases triplas)
+    // 3. Monta o resumo limpo com o bloco de código ativado
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
