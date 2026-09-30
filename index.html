@@ -374,7 +374,7 @@ function atualizarResumoCard() {
 
     if (nome && chave) {
         lblNome.innerText = nome;
-        lblChave.innerText = `${tipo}: ${chave}`;
+        lblChave.innerText = `${tipo}:${chave}`;
     } else {
         lblNome.innerText = 'Sem recebedor cadastrado';
         lblChave.innerText = 'Clique para configurar seus dados';
@@ -645,7 +645,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
-// --- FUNÇÃO CORRIGIDA DO WHATSAPP ---
+// --- FUNÇÃO LIMPA DO WHATSAPP ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -671,13 +671,12 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // 3. Monta o resumo incluindo o código Pix formatado entre crases triplas
+    // 3. Monta o resumo limpo com o bloco de código ativado
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
                            `👇 *Código Pix Copia e Cola:*\n` +
-                           `\`\`\`${pixCode}\`\`\`\n\n` +
-                           `_Toque em copiar código Pix abaixo se necessário._`;
+                           `\`\`\`${pixCode}\`\`\``;
 
     // 4. Monta a URL de redirecionamento
     const params = new URLSearchParams();
