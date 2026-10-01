@@ -16,7 +16,7 @@
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
     <!-- Biblioteca QR Code -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -379,7 +379,7 @@ function atualizarResumoCard() {
 
     if (nome && chave) {
         lblNome.innerText = nome;
-        lblChave.innerText = `${tipo}:${chave}`;
+        lblChave.innerText = `${tipo}: ${chave}`;
     } else {
         lblNome.innerText = 'Sem recebedor cadastrado';
         lblChave.innerText = 'Clique para configurar seus dados';
@@ -650,7 +650,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
-// --- FUNÇÃO DO WHATSAPP COM AS CRASE TRIPLAS PARA O BOTÃO NATIVO ---
+// --- FUNÇÃO DO WHATSAPP ORIGINAL (TEXTO EM AZUL E BOTÃO NATIVO) ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -674,15 +674,16 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
+    // Formato original com o código solto para o WhatsApp transformá-lo em link azul com a opção de copiar
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
                            `👇 *Código Pix Copia e Cola:*\n` +
-                           `\`\`\`${pixCode}\`\`\``;
+                           `${pixCode}`;
 
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
-    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
+    const urlFinal = `[https://api.whatsapp.com/send?$](https://api.whatsapp.com/send?$){params.toString()}`;
 
     setTimeout(() => {
         window.location.href = urlFinal;
