@@ -2,13 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QrPix</title>
-    
-    <!-- Configurações para forçar o modo Aplicativo Nativo / Standalone -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Configurações PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -16,7 +11,7 @@
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
     <!-- Biblioteca QR Code -->
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -650,7 +645,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
-// --- FUNÇÃO DO WHATSAPP ORIGINAL (TEXTO EM AZUL E BOTÃO NATIVO) ---
+// --- ENVIO EM 2 ETAPAS ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -660,6 +655,7 @@ async function enviarWhatsApp() {
         return;
     }
 
+    // 1. Copia o código Pix para a área de transferência do celular
     const copiado = await copiarParaClipboardAssincrono(pixCode);
     if (!copiado) {
         try {
@@ -669,22 +665,25 @@ async function enviarWhatsApp() {
         } catch (e) {}
     }
 
+    // 2. Notifica com o toast
     mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
 
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // Formato original com o código solto para o WhatsApp transformá-lo em link azul com a opção de copiar
+    // 3. Monta o resumo destacando em negrito e itálico apenas "copiar código Pix"
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
-                           `👇 *Código Pix Copia e Cola:*\n` +
-                           `${pixCode}`;
+                           `👇 *O código Pix vai na mensagem abaixo:*\n` +
+                           `Caso não apareça o botão _*copiar código Pix*_, pressione o dedo em cima do código para copiar`;
 
+    // 4. Monta a URL de redirecionamento
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
-    const urlFinal = `[https://api.whatsapp.com/send?$](https://api.whatsapp.com/send?$){params.toString()}`;
+    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
 
+    // 5. Redireciona para o WhatsApp após breve delay
     setTimeout(() => {
         window.location.href = urlFinal;
     }, 200);
