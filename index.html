@@ -11,16 +11,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2563eb">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- BIBLIOTECA QR CODE 100% EMBUTIDA (FUNCIONA OFFLINE) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="carregarQrCodeAlternativo()"></script>
+    <!-- BIBLIOTECA QR CODE EMBUTIDA COM TRATAMENTO ANTI-FRESTA PARA CANVAS -->
     <script>
-    function carregarQrCodeAlternativo() {
-        // Fallback caso o CDN falhe em ambiente restrito
-        var script = document.createElement('script');
-        script.src = "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js";
-        document.head.appendChild(script);
-    }
+    var QRCode;!function(){function a(a){this.mode=s.MODE_8BIT_BYTE,this.data=a,this.parsedData=[]}function b(a,b){this.typeNumber=a,this.errorCorrectionLevel=b,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function c(a,b){if(void0==a.length)throw new Error(a.length+"/"+b);for(var c=0;c<a.length;c++)a[c]=b(a[c]);return a}function d(a,b){return a.set(b),a}function e(a){return unescape(encodeURIComponent(a))}function f(a,b){this.rowspan=a,this.colspan=b}function g(a){return Math.floor(Math.log(a)/Math.log(2))}function h(a,b){for(var c="",d=0;d<b;d++)c+="0";return(c+a).slice(-b)}function i(a,b){for(var c=0,d=0;d<b;d++)c=(c<<1)+a[d];return c}function j(a,b){for(var c=new Array(b),d=0;d<b;d++)c[d]=0;return d(c,a),c}function k(a,b){for(var c=0;c<a.length;c++)for(var d=0;d<a[c].length;d++)b(a,c,d)}a.prototype={getDataLength:function(){return this.parsedData.length},write:function(a){for(var b=0,c=this.parsedData.length;b<c;b++)a.put(this.parsedData[b],8)},writeString:function(a){for(var b=e(a),c=0;c<b.length;c++)this.parsedData.push(b.charCodeAt(c))}};var l=function(){var a=1;return{getPixel:function(){return a},setPixel:function(b){a=b}}}();b.prototype={addData:function(a){var b=new a(a);this.dataList.push(b),this.dataCache=null},isDark:function(a,b){if(0>a||this.moduleCount<=a||0>b||this.moduleCount<=b)throw new Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,b){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var c=0;c<this.moduleCount;c++){this.modules[c]=new Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++)this.modules[c][d]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(a,b),this.typeNumber>=7&&this.setupTypeNumber(a),null==this.dataCache&&(this.dataCache=b.createData(this.typeNumber,this.errorCorrectionLevel,this.dataList)),this.mapData(this.dataCache,b)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(-1>=a+c||a+c>=this.moduleCount))for(var d=-1;7>=d;d++)-1>=b+d||b+d>=this.moduleCount||(this.modules[a+c][b+d]=(0>=c&&6>=c&&(0==d||6==d))||(6>=c&&0>=c&&(0==d||6==d))||2>=c&&4>=c&&2>=d&&4>=d)};var m=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,52,78,104,130,156],[6,30,56,82,108,134,160]];b.prototype.setupPositionAdjustPattern=function(){var a=m[this.typeNumber-1];if(a)for(var b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(null==this.modules[d][e])for(var f=-2;2>=f;f++)for(var g=-2;2>=g;g++)this.modules[d+f][e+g]=-2==f||2==f||-2==g||2==g||0==f&&0==g}};b.prototype.setupTimingPattern=function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2),null==this.modules[6][a]&&(this.modules[6][a]=0==a%2)};b.prototype.setupTypeNumber=function(a){for(var b=this.typeNumber,c=18,d=12;d>0;d--)c=(c<<1)^((1&c)?79:0);for(var d=0;18>d;d++)var e=a?(c>>d)&1:0,f=b-300;b.prototype.setupTypeInfo=function(a,b){for(var c=(b.errorCorrectionLevel<<3)|b.maskPattern,d=c,e=10;e>0;e--)d=(d<<1)^((1&d)?1335:0);for(var f=((c<<10)|d)^21522,g=0;15>g;g++){var h=a?(f>>g)&1:0;this.modules[g>7?g-1:g][g>7?8:15-g]=h}},b.prototype.mapData=function(a,b){for(var c=-1,d=this.moduleCount-1,e=7,f=0,g=this.moduleCount-1;g>0;g-=2)for(6==g&&g--;;)for(var h=0;2>h;h++)if(null==this.modules[d][g-h]){var i=0;f<a.length&&(i=(a[f]>>e)&1),b.getMask(d,g-h)&&(i=1^i),this.modules[d][g-h]=i,e--,0>e&&(f++,e=7)}if(d+=c,0>d||d>=this.moduleCount){c=-c,d+=c}}}var n=function(){var a=new Array(256),b=new Array(255);for(var c=0;255>c;c++)a[c]=1<<c;for(var c=0;255>c;c++)b[a[c]]=c;return{glog:function(a){if(1>a)throw new Error("glog("+a+")");return b[a]},gexp:function(a){return a<0&&(a%=255,a+=255),a>=255&&(a%=255),a[a]}}}();a.BitBuffer=function(){this.buffer=[],this.length=0},a.BitBuffer.prototype={get:function(a){var b=Math.floor(a/8);return(1&(this.buffer[b]>>7-a%8))!=0},put:function(a,b){for(var c=0;c<b;c++)this.putBit(1&(a>>b-c-1));return this},length:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);this.buffer.length<=b&&this.buffer.push(0),a&&(this.buffer[b]|=128-this.length%8),this.length++}};var o=function(a){return{errorCorrectionLevel:a,createData:function(b,c,d){for(var e=0,f=0,g=0,h=new Array(3),i=0;i<3;i++){var j=s.getRSBlocks(b,c,i);h[i]=j}for(var i=0;i<d.length;i++){var k=d[i];e+=k.getLength(),f+=k.getLengthBytes(),g+=k.getRSBlocksCount(b,c)}var l=s.getTotalCodeCount(b,c);if(l<f)throw new Error("code length overflow. ("+f+"/"+l+")");for(var m=new a.BitBuffer,i=0;i<d.length;i++){var k=d[i];m.put(k.mode,4),m.put(k.getDataLength(),s.getLengthInBits(k.mode,b)),k.write(m)}for(var n=8*l-m.length,i=0;n>=i&&8>i;i++)m.putBit(0);for(m.length%8!=0&&(m.putBit(0),m.length%8!=0);m.length%8!=0;)m.putBit(0);for(var i=0;;i++){if(i>=d.length)break;var o=d[i];o.getDataLength();o.getLengthBytes()}return m.buffer}}},p=function(a){return{getMask:function(b,c){switch(a){case 0:return(b+c)%2==0;case 1:return b%2==0;case 2:return c%3==0;case 3:return(b+c)%3==0;case 4:return(Math.floor(b/2)+Math.floor(c/3))%2==0;case 5:return b*c%2+b*c%3==0;case 6:return(b*c%2+b*c%3)%2==0;case 7:return(b+c)%2+(b*c%3)%2==0;default:throw new Error("bad maskPattern:"+a)}}}},q=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92],[2,58,36,4,59,37],[4,46,20,5,47,21],[4,36,12,4,37,13],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[1,110,85,5,111,86],[1,123,103,4,124,104],[5,90,64,1,91,65],[5,47,22,5,48,23],[3,45,12,13,46,13],[3,117,95,4,118,96],[3,58,38,5,59,39],[4,51,24,4,52,25],[1,107,83,8,108,84],[3,115,90,4,116,91],[3,58,36,5,59,37],[4,46,20,4,47,21],[4,42,12,5,43,13],[4,115,93,6,116,94],[2,73,43,7,74,44],[4,53,22,7,54,23],[3,45,12,13,46,13],[2,115,107,3,116,108],[2,59,37,7,60,38],[4,44,20,7,45,21],[4,33,11,13,34,12],[4,115,115,4,116,116],[3,58,39,8,59,40],[4,52,24,8,53,25],[4,36,12,12,37,13],[2,121,97,4,122,98],[3,60,38,4,61,39],[4,40,18,5,41,19],[4,35,12,11,36,13],[5,120,101,5,121,102],[3,58,36,7,59,37],[4,50,22,7,51,23],[4,36,12,13,37,13],[5,115,93,5,116,94],[4,58,36,7,59,37],[6,46,20,7,47,21],[4,36,12,13,37,13],[1,130,107,5,131,108],[5,84,48,7,85,49],[4,50,22,11,51,23],[4,36,12,11,37,13],[2,141,113,3,142,114],[3,70,44,11,71,45],[5,47,22,11,48,23],[4,36,12,13,37,13],[3,135,107,3,136,108],[3,67,41,13,68,42],[4,54,24,11,55,25],[4,36,12,13,37,13],[3,145,115,1,146,116],[4,69,43,14,70,44],[6,43,19,16,44,20],[6,43,15,14,44,16],[4,109,87,4,110,88],[4,65,41,8,66,42],[6,42,20,8,43,21],[4,35,12,12,36,13],[3,123,102,4,124,103],[3,73,45,11,74,46],[5,54,24,11,55,25],[13,36,12,4,37,13],[3,143,113,4,144,114],[3,70,44,13,71,45],[4,53,22,16,54,23],[10,36,12,6,37,13],[3,138,107,4,139,108],[3,71,45,13,72,46],[4,54,24,16,55,25],[9,36,12,8,37,13],[3,142,111,4,143,112],[3,73,45,13,74,46],[4,53,22,16,54,23],[10,36,12,6,37,13],[2,152,121,4,153,122],[3,73,45,13,74,46],[4,53,22,16,54,23],[10,36,12,6,37,13],[4,147,121,1,148,122],[3,73,45,13,74,46],[4,53,22,16,54,23],[10,36,12,6,37,13]],s={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},t=function(a,b){for(var c=0,d=0,e=q.length;e>d;d++){var f=q[d];if(f[0]==a&&f[1]==b){c=f[2];break}}return c};s.getRSBlocks=function(a,b,c){var d=t(a,b);if(0>d)throw new Error("bad rs block. typeNumber="+a+"/errorCorrectionLevel="+b);var e=d.length/3,f=[];for(var g=0;e>g;g++){var h=d[3*g],i=d[3*g+1],j=d[3*g+2];for(var k=0;h>k;k++)f.push({totalCount:i,dataCount:j})}return f[c]},s.getTotalCodeCount=function(a,b){var c=t(a,b);if(0>c)throw new Error("bad rs block. typeNumber="+a+"/errorCorrectionLevel="+b);for(var d=0,e=c.length/3,f=0;e>f;f++)d+=c[3*f]*c[3*f+1];return d},s.getLengthInBits=function(a,b){switch(a){case s.MODE_NUMBER:return 10>=b?10:12>b?12:14;case s.MODE_ALPHA_NUM:return 10>=b?9:12>b?11:13;case s.MODE_8BIT_BYTE:return 10>=b?8:16;case s.MODE_KANJI:return 10>=b?8:12>b?10:12;default:throw new Error("mode:"+a)}},s.CorrectLevel={L:1,M:0,Q:3,H:2};var u=function(a,b){function c(a){return unescape(encodeURIComponent(a))}function d(a,b){for(var c=0;c<a.length;c++)a[c]=b(a[c]);return a}function e(a,b){return a.set(b),a}function f(a){return Math.floor(Math.log(a)/Math.log(2))}function g(a,b){for(var c="",d=0;d<b;d++)c+="0";return(c+a).slice(-b)}function h(a,b){this.mode=s.MODE_8BIT_BYTE,this.data=a,this.parsedData=[]}function i(a){var b=c(a);for(var d=0;d<b.length;d++)this.parsedData.push(b.charCodeAt(d))}function j(a,b){for(var c=0,d=0;d<b;d++)c=(c<<1)+a[d];return c}function k(a,b){for(var c=new Array(b),d=0;d<b;d++)c[d]=0;return e(c,a),c}function l(a,b){for(var c=0;c<a.length;c++)for(var d=0;d<a[c].length;d++)b(a,c,d)}h.prototype={getDataLength:function(){return this.parsedData.length},write:function(a){for(var b=0,c=this.parsedData.length;b<c;b++)a.put(this.parsedData[b],8)},writeString:function(a){var b=c(a);for(var d=0;d<b.length;d++)this.parsedData.push(b.charCodeAt(d))}};var m={};m.createCanvas=function(){return document.createElement("canvas")};var n=function(a,b){this._htOption=b,this._oName="undefined"!=typeof CanvasRenderingContext2D?"canvas":"table",this._el=a,this._oQRCode=null,this.clear(),this.make(a)};return n.prototype.make=function(a){if(this._oQRCode=new b(this._htOption.typeNumber,this._htOption.errorCorrectionLevel),this._oQRCode.addData(this._htOption.text),this._oQRCode.make(),this._el.appendChild(this.draw()),this._oQRCode.isDark(0,0));},n.prototype.draw=function(){var a=document.createElement("canvas");a.width=this._htOption.width,a.height=this._htOption.height;var b=a.getContext("2d");if(!b)return null;for(var c=this._htOption.width/this._oQRCode.getModuleCount(),d=this._htOption.height/this._oQRCode.getModuleCount(),e=0;e<this._oQRCode.getModuleCount();e++)for(var f=0;f<this._oQRCode.getModuleCount();f++){this._oQRCode.isDark(e,f)&&(b.fillStyle=this._htOption.colorDark,b.fillRect(Math.round(f*c),Math.round(e*d),Math.ceil(c)+0.5,Math.ceil(d)+0.5));}return a},n.prototype.clear=function(){this._el.innerHTML=""},n;};window.QRCode=u;}(window);
     </script>
     
     <style>
@@ -59,6 +54,7 @@
         }
         .pix-color { color: #06b6d4; }
 
+        /* Cartão Discreto do Recebedor */
         .card-recebedor {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -104,8 +100,14 @@
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 6px;
+            transition: background 0.2s;
             width: auto;
             margin: 0;
+            line-height: normal;
+        }
+        .btn-alterar:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
         }
 
         label { font-size: 14px; font-weight: 700; color: #1e3a8a; display: block; margin-top: 14px; }
@@ -119,6 +121,7 @@
             font-size: 18px; 
             background: #f8fafc; 
             color: #1e293b;
+            transition: all 0.2s;
         }
         
         .input-valor {
@@ -126,6 +129,13 @@
             font-weight: bold;
             text-align: center;
             color: #2563eb;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
         }
 
         button.btn-principal { 
@@ -139,9 +149,14 @@
             font-weight: bold; 
             margin-top: 16px; 
             cursor: pointer; 
+            transition: background 0.2s, transform 0.1s;
         }
+        button.btn-principal:hover { background-color: #1d4ed8; }
+        button.btn-principal:active { transform: scale(0.99); }
         
         .btn-whatsapp { background-color: #25d366 !important; color: white; margin-top: 10px; }
+        .btn-whatsapp:hover { background-color: #1eb954 !important; }
+        
         #btn-instalar { background-color: #0f172a; color: white; display: none; margin-top: 15px; }
         
         #qrcode-container { 
@@ -206,6 +221,7 @@
         <h1>Qr<span class="pix-color">Pix</span></h1>
     </div>
 
+    <!-- Resumo Sutil do Recebedor -->
     <div class="card-recebedor">
         <div class="recebedor-info">
             <span class="recebedor-nome" id="resumo-nome">Sem recebedor cadastrado</span>
@@ -214,6 +230,7 @@
         <button type="button" class="btn-alterar" onclick="toggleConfig()" id="btn-alterar-texto">Alterar</button>
     </div>
 
+    <!-- Painel de Configurações do Recebedor -->
     <div id="config-box" class="config-box">
         <label for="tipoChave" style="margin-top: 0;">Tipo de Chave Pix:</label>
         <select id="tipoChave" onchange="alterarTipoChave()">
@@ -236,6 +253,7 @@
         <button type="button" class="btn-principal" onclick="salvarEFecharConfig()" style="background-color: #0f172a; margin-top: 14px;">Salvar Dados</button>
     </div>
 
+    <!-- Tela Principal -->
     <label for="valor">Digite o Valor (R$):</label>
     <input type="text" id="valor" class="input-valor" placeholder="0,00" inputmode="numeric" autofocus>
 
@@ -257,8 +275,32 @@
 <div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
+// --- SISTEMA DE ARMAZENAMENTO DUPLO E PERMANENTE COM SINCRONIZAÇÃO AUTOMÁTICA ---
+let db;
+const dbName = "QrPixDatabase_V2";
+
+function iniciarBanco() {
+    return new Promise((resolve) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = function(e) {
+            let dbInstance = e.target.result;
+            if (!dbInstance.objectStoreNames.contains("dados")) {
+                dbInstance.createObjectStore("dados", { keyPath: "campo" });
+            }
+        };
+        request.onsuccess = function(e) { db = e.target.result; resolve(); };
+        request.onerror = function() { resolve(); };
+    });
+}
+
 function salvarDado(campo, valor) {
     try { localStorage.setItem('pix_perm_' + campo, valor); } catch (e) {}
+    if (db) {
+        try {
+            const tx = db.transaction("dados", "readwrite");
+            tx.objectStore("dados").put({ campo: campo, valor: valor });
+        } catch (err) {}
+    }
     atualizarResumoCard();
 }
 
@@ -274,6 +316,41 @@ function carregarDados() {
     if (chave) document.getElementById('chave').value = chave;
     if (nome) document.getElementById('nome').value = nome;
     if (cidade) document.getElementById('cidade').value = cidade;
+
+    if (db) {
+        try {
+            const tx = db.transaction("dados", "readonly");
+            const store = tx.objectStore("dados");
+            
+            store.get("tipoChave").onsuccess = (e) => {
+                if (e.target.result && e.target.result.valor) {
+                    document.getElementById('tipoChave').value = e.target.result.valor;
+                    localStorage.setItem('pix_perm_tipoChave', e.target.result.valor);
+                    alterarTipoChave();
+                }
+            };
+            store.get("chave").onsuccess = (e) => {
+                if (e.target.result && e.target.result.valor) {
+                    document.getElementById('chave').value = e.target.result.valor;
+                    localStorage.setItem('pix_perm_chave', e.target.result.valor);
+                    atualizarResumoCard();
+                }
+            };
+            store.get("nome").onsuccess = (e) => {
+                if (e.target.result && e.target.result.valor) {
+                    document.getElementById('nome').value = e.target.result.valor;
+                    localStorage.setItem('pix_perm_nome', e.target.result.valor);
+                    atualizarResumoCard();
+                }
+            };
+            store.get("cidade").onsuccess = (e) => {
+                if (e.target.result && e.target.result.valor) {
+                    document.getElementById('cidade').value = e.target.result.valor;
+                    localStorage.setItem('pix_perm_cidade', e.target.result.valor);
+                }
+            };
+        } catch (err) {}
+    }
 
     atualizarResumoCard();
 
@@ -293,7 +370,7 @@ function atualizarResumoCard() {
 
     if (nome && chave) {
         lblNome.innerText = nome;
-        lblChave.innerText = `${tipo}: ${chave}`;
+        lblChave.innerText = `${tipo}:${chave}`;
     } else {
         lblNome.innerText = 'Sem recebedor cadastrado';
         lblChave.innerText = 'Clique para configurar seus dados';
@@ -356,7 +433,8 @@ function alterarTipoChave() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    await iniciarBanco();
     carregarDados();
     document.getElementById('chave').addEventListener('input', (e) => salvarDado('chave', e.target.value));
     document.getElementById('nome').addEventListener('input', (e) => salvarDado('nome', e.target.value));
@@ -483,7 +561,7 @@ function gerarPix() {
 
     setTimeout(() => {
         if (typeof QRCode === 'undefined') {
-            alert('A biblioteca do QR Code não carregou. Verifique sua conexão com a internet para o primeiro carregamento.');
+            alert('A biblioteca do QR Code não carregou. Verifique se o arquivo index.html possui o script embutido.');
             return;
         }
 
@@ -544,6 +622,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
+// --- WHATSAPP COM AS FIGURINHAS E CÓDIGO PIX EM ASPAS TRIPLAS (BLOCO DE CÓDIGO) ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -567,15 +646,26 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
+    // Mensagem com as figurinhas e o código Pix envolvido em aspas triplas para formar o bloco legível
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
                            `👇 *Código Pix Copia e Cola:*\n` +
-                           `${pixCode}`;
+                           `\`\`\`\n${pixCode}\n\`\`\``;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Dados para Pagamento Pix',
+                text: mensagemResumo
+            });
+            return;
+        } catch (e) {}
+    }
 
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
-    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
+    const urlFinal = `[https://api.whatsapp.com/send?$](https://api.whatsapp.com/send?$){params.toString()}`;
 
     setTimeout(() => {
         window.open(urlFinal, '_blank');
