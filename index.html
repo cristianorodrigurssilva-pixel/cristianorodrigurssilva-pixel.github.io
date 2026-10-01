@@ -615,38 +615,22 @@ function mostrarAviso(mensagemPersonalizada) {
     }, 2200);
 }
 
-async function copiarParaClipboardAssincrono(texto) {
-    if (navigator.clipboard && window.isSecureContext) {
-        try {
-            await navigator.clipboard.writeText(texto);
-            return true;
-        } catch (err) {
-            return false;
-        }
-    }
-    return false;
-}
-
 function copiarPix(silencioso = false) {
     const payloadInput = document.getElementById('pix-payload');
-    const texto = payloadInput ? payloadInput.value.trim() : '';
-    if (!texto) return;
+    if (!payloadInput || !payloadInput.value.trim()) return;
 
     payloadInput.focus();
     payloadInput.select();
 
-    copiarParaClipboardAssincrono(texto).then((sucesso) => {
-        if (!sucesso) {
-            try {
-                document.execCommand('copy');
-            } catch (e) {}
-        }
-        if (!silencioso) mostrarAviso();
-    });
+    try {
+        document.execCommand('copy');
+    } catch (e) {}
+
+    if (!silencioso) mostrarAviso();
 }
 
-// --- ENVIO EM 2 ETAPAS ---
-async function enviarWhatsApp() {
+// --- ENVIO CORRIGIDO (Mensagem Separada + Cópia Síncrona Garantida) ---
+function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
 
@@ -655,38 +639,34 @@ async function enviarWhatsApp() {
         return;
     }
 
-    // 1. Copia o código Pix para a área de transferência do celular
-    const copiado = await copiarParaClipboardAssincrono(pixCode);
-    if (!copiado) {
-        try {
-            payloadInput.focus();
-            payloadInput.select();
-            document.execCommand('copy');
-        } catch (e) {}
-    }
+    // 1. Cópia síncrona instantânea para a memória antes de mudar de página
+    payloadInput.focus();
+    payloadInput.select();
+    try {
+        document.execCommand('copy');
+    } catch (e) {}
 
-    // 2. Notifica com o toast
-    mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
+    // 2. Exibe o aviso visual de que foi copiado
+    mostrarAviso('✓ Pix copiado! Cole a chave após enviar.');
 
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // 3. Monta o resumo destacando em negrito e itálico apenas "copiar código Pix"
+    // 3. Monta a mensagem exata (SEPARADA, sem o código gigante dentro)
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
-                           `👇 *O código Pix vai na mensagem abaixo:*\n` +
-                           `Caso não apareça o botão _*copiar código Pix*_, pressione o dedo em cima do código para copiar`;
+                           `👇 *Código Pix Copia e Cola:*`;
 
-    // 4. Monta a URL de redirecionamento
+    // 4. Cria a URL do WhatsApp
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
     const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
 
-    // 5. Redireciona para o WhatsApp após breve delay
+    // 5. Redireciona para o WhatsApp após um pequeno respiro
     setTimeout(() => {
         window.location.href = urlFinal;
-    }, 200);
+    }, 300);
 }
 
 if ('serviceWorker' in navigator) {
