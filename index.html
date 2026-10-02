@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,8 +11,8 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- Biblioteca QR Code via CDN Confiável -->
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)" onerror="alert('Erro ao carregar a biblioteca de QR Code. Verifique sua conexão com a internet.');"></script>
+    <!-- Biblioteca QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -23,8 +24,6 @@
             justify-content: center; 
             align-items: center;
             min-height: 100vh;
-            height: 100%;
-            overflow-x: hidden;
         }
         
         .container { 
@@ -36,7 +35,6 @@
             box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12); 
             border: 1px solid #bfdbfe;
             position: relative;
-            margin: 10px;
         }
         
         .header {
@@ -165,7 +163,6 @@
             padding: 12px;
             border-radius: 12px;
             border: 1px dashed #38bdf8;
-            min-height: 204px;
         }
         
         .result-box { display: none; margin-top: 15px; }
@@ -256,7 +253,7 @@
     <label for="valor">Digite o Valor (R$):</label>
     <input type="text" id="valor" class="input-valor" placeholder="0,00" inputmode="numeric" autofocus>
 
-    <button type="button" class="btn-principal" onclick="iniciarGeracaoPix()">Gerar PIX</button>
+    <button type="button" class="btn-principal" onclick="gerarPix()">Gerar PIX</button>
 
     <div id="result" class="result-box">
         <div id="qrcode-container"></div>
@@ -274,8 +271,9 @@
 <div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
+// --- SISTEMA DE ARMAZENAMENTO DUPLO E PERMANENTE ---
 let db;
-const dbName = "QrPixDatabase_V3";
+const dbName = "QrPixDatabase_V2";
 
 function iniciarBanco() {
     return new Promise((resolve) => {
@@ -461,6 +459,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('cidade').addEventListener('input', (e) => salvarDado('cidade', e.target.value));
 });
 
+// Formatação do Valor
 document.getElementById('valor').addEventListener('input', function(e) {
     let value = e.target.value.replace(/\D/g, '');
     if (!value) {
@@ -472,6 +471,7 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = result;
 });
 
+// CRC16 CCITT-FALSE
 function CRC16(str) {
     let crc = 0xFFFF;
     const encoder = new TextEncoder();
@@ -531,14 +531,6 @@ function tratarChavePixPorTipo(chaveBruta, tipo) {
     return c;
 }
 
-function iniciarGeracaoPix() {
-    if (typeof QRCode === 'undefined') {
-        alert('Erro Crítico: A biblioteca do QR Code não foi carregada. Verifique sua conexão com a internet.');
-        return;
-    }
-    gerarPix();
-}
-
 function gerarPix() {
     let tipo = document.getElementById('tipoChave').value || localStorage.getItem('pix_perm_tipoChave') || 'CELULAR';
     let chaveBruta = document.getElementById('chave').value || localStorage.getItem('pix_perm_chave') || '';
@@ -591,12 +583,19 @@ function gerarPix() {
     const qrContainer = document.getElementById('qrcode-container');
     qrContainer.innerHTML = '';
 
-    new QRCode(qrContainer, { 
-        text: pixCompleto, 
-        width: 180, 
-        height: 180,
-        correctLevel: QRCode.CorrectLevel.M
-    });
+    setTimeout(() => {
+        if (typeof QRCode === 'undefined') {
+            alert('A biblioteca do QR Code não carregou. Verifique sua conexão com a internet e tente novamente.');
+            return;
+        }
+
+        new QRCode(qrContainer, { 
+            text: pixCompleto, 
+            width: 180, 
+            height: 180,
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }, 50);
 }
 
 function mostrarAviso(mensagemPersonalizada) {
@@ -607,51 +606,110 @@ function mostrarAviso(mensagemPersonalizada) {
     toast.classList.add('show');
     btn.innerText = '✓ Código Copiado!';
     btn.style.backgroundColor = '#06b6d4';
-    
-    setTimeout(() => {
+    btn.style.color = '#0f172a';
+
+    setTimeout(function() {
         toast.classList.remove('show');
         btn.innerText = 'Copiar Código Pix';
         btn.style.backgroundColor = '#2563eb';
-    }, 3000);
+        btn.style.color = '#ffffff';
+    }, 2200);
 }
 
-function copiarPix() {
-    const payloadText = document.getElementById('pix-payload');
-    payloadText.select();
-    payloadText.setSelectionRange(0, 99999);
-    
-    try {
-        navigator.clipboard.writeText(payloadText.value).then(() => {
-            mostrarAviso('✓ Código Pix copiado!');
-        }).catch(() => {
+async function copiarParaClipboardAssincrono(texto) {
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(texto);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+    return false;
+}
+
+function copiarPix(silencioso = false) {
+    const payloadInput = document.getElementById('pix-payload');
+    const texto = payloadInput ? payloadInput.value.trim() : '';
+    if (!texto) return;
+
+    payloadInput.focus();
+    payloadInput.select();
+
+    copiarParaClipboardAssincrono(texto).then((sucesso) => {
+        if (!sucesso) {
+            try {
+                document.execCommand('copy');
+            } catch (e) {}
+        }
+        if (!silencioso) mostrarAviso();
+    });
+}
+
+// --- ENVIO EM 2 ETAPAS ---
+async function enviarWhatsApp() {
+    const payloadInput = document.getElementById('pix-payload');
+    const pixCode = payloadInput ? payloadInput.value.trim() : '';
+
+    if (!pixCode) {
+        alert('Gere o código Pix antes de enviar!');
+        return;
+    }
+
+    // 1. Copia o código Pix para a área de transferência do celular
+    const copiado = await copiarParaClipboardAssincrono(pixCode);
+    if (!copiado) {
+        try {
+            payloadInput.focus();
+            payloadInput.select();
             document.execCommand('copy');
-            mostrarAviso('✓ Código Pix copiado!');
-        });
-    } catch (e) {
-        document.execCommand('copy');
-        mostrarAviso('✓ Código Pix copiado!');
+        } catch (e) {}
     }
-}
 
-function enviarWhatsApp() {
-    const payload = document.getElementById('pix-payload').value;
-    const valor = document.getElementById('valor').value;
-    let mensagem = "Olá! Segue o código Pix Copia e Cola";
-    if (valor) {
-        mensagem += " no valor de R$ " + valor;
-    }
-    // Envolve o payload em crases triplas para gerar o bloco de código nativo do WhatsApp com botão de copiar
-    mensagem += ":\n\n```\n" + payload + "\n```";
-    
-    const url = "[https://api.whatsapp.com/send?text=](https://api.whatsapp.com/send?text=)" + encodeURIComponent(mensagem);
-    window.open(url, '_blank');
+    // 2. Notifica com o toast
+    mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
+
+    const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
+    const valor = document.getElementById('valor').value || '0,00';
+
+    // 3. Monta o resumo destacando em negrito e itálico apenas "copiar código Pix"
+    const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
+                           `👤 *Recebedor:* ${nome}\n` +
+                           `💵 *Valor:* R$ ${valor}\n\n` +
+                           `👇 *O código Pix vai na mensagem abaixo:*\n` +
+                           `Caso não apareça o botão _*copiar código Pix*_, pressione o dedo em cima do código para copiar`;
+
+    // 4. Monta a URL de redirecionamento
+    const params = new URLSearchParams();
+    params.append('text', mensagemResumo);
+    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
+
+    // 5. Redireciona para o WhatsApp após breve delay
+    setTimeout(() => {
+        window.location.href = urlFinal;
+    }, 200);
 }
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {});
     });
 }
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('btn-instalar').style.display = 'block';
+});
+
+document.getElementById('btn-instalar').addEventListener('click', (e) => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    }
+});
 </script>
+
 </body>
 </html>
