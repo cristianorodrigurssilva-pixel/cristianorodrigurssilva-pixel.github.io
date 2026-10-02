@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- Biblioteca QR Code (Carregamento Local Garantido) -->
-    <script src="./qrcode.min.js" onerror="alert('Erro Crítico: O arquivo qrcode.min.js não foi encontrado na mesma pasta do index.html. Verifique se o arquivo existe e está nomeado corretamente.');"></script>
+    <!-- Biblioteca QR Code via CDN Confiável (Resolve o erro do GitHub Pages) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="alert('Erro ao carregar a biblioteca de QR Code. Verifique sua conexão com a internet.');"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -533,7 +533,7 @@ function tratarChavePixPorTipo(chaveBruta, tipo) {
 
 function iniciarGeracaoPix() {
     if (typeof QRCode === 'undefined') {
-        alert('Erro Crítico: A biblioteca do QR Code não foi carregada. Verifique se o arquivo qrcode.min.js está presente e acessível.');
+        alert('Erro Crítico: A biblioteca do QR Code não foi carregada. Verifique sua conexão com a internet.');
         return;
     }
     gerarPix();
