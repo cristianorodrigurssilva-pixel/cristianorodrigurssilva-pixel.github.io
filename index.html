@@ -165,7 +165,7 @@
             padding: 12px;
             border-radius: 12px;
             border: 1px dashed #38bdf8;
-            min-height: 204px; /* Altura minima para o QR de 180px + padding */
+            min-height: 204px;
         }
         
         .result-box { display: none; margin-top: 15px; }
@@ -274,7 +274,6 @@
 <div id="toast" class="toast">✓ Código Pix copiado!</div>
 
 <script>
-// --- INICIALIZAÇÃO SEGURA DA BIBLIOTECA ---
 let db;
 const dbName = "QrPixDatabase_V3";
 
@@ -462,7 +461,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('cidade').addEventListener('input', (e) => salvarDado('cidade', e.target.value));
 });
 
-// Formatação do Valor
 document.getElementById('valor').addEventListener('input', function(e) {
     let value = e.target.value.replace(/\D/g, '');
     if (!value) {
@@ -474,7 +472,6 @@ document.getElementById('valor').addEventListener('input', function(e) {
     e.target.value = result;
 });
 
-// CRC16 CCITT-FALSE
 function CRC16(str) {
     let crc = 0xFFFF;
     const encoder = new TextEncoder();
@@ -534,9 +531,7 @@ function tratarChavePixPorTipo(chaveBruta, tipo) {
     return c;
 }
 
-// --- FUNÇÃO DE GERAÇÃO SEGURA ---
 function iniciarGeracaoPix() {
-    // Verificação Crítica: Se a biblioteca não carregou, para aqui.
     if (typeof QRCode === 'undefined') {
         alert('Erro Crítico: A biblioteca do QR Code não foi carregada. Verifique se o arquivo qrcode.min.js está presente e acessível.');
         return;
@@ -596,7 +591,6 @@ function gerarPix() {
     const qrContainer = document.getElementById('qrcode-container');
     qrContainer.innerHTML = '';
 
-    // Gerar QR Code
     new QRCode(qrContainer, { 
         text: pixCompleto, 
         width: 180, 
@@ -612,4 +606,51 @@ function mostrarAviso(mensagemPersonalizada) {
     toast.innerText = mensagemPersonalizada || '✓ Código Pix copiado!';
     toast.classList.add('show');
     btn.innerText = '✓ Código Copiado!';
-    btn.style.backgroundColor = '#06
+    btn.style.backgroundColor = '#06b6d4';
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        btn.innerText = 'Copiar Código Pix';
+        btn.style.backgroundColor = '#2563eb';
+    }, 3000);
+}
+
+function copiarPix() {
+    const payloadText = document.getElementById('pix-payload');
+    payloadText.select();
+    payloadText.setSelectionRange(0, 99999);
+    
+    try {
+        navigator.clipboard.writeText(payloadText.value).then(() => {
+            mostrarAviso('✓ Código Pix copiado!');
+        }).catch(() => {
+            document.execCommand('copy');
+            mostrarAviso('✓ Código Pix copiado!');
+        });
+    } catch (e) {
+        document.execCommand('copy');
+        mostrarAviso('✓ Código Pix copiado!');
+    }
+}
+
+function enviarWhatsApp() {
+    const payload = document.getElementById('pix-payload').value;
+    const valor = document.getElementById('valor').value;
+    let mensagem = "Olá! Segue o código Pix Copia e Cola";
+    if (valor) {
+        mensagem += " no valor de R$ " + valor;
+    }
+    mensagem += ":\n\n" + payload;
+    
+    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensagem);
+    window.open(url, '_blank');
+}
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+}
+</script>
+</body>
+</html>
