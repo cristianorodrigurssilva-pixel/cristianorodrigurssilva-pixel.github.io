@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- Biblioteca QR Code via CDN Confiável (Resolve o erro do GitHub Pages) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="alert('Erro ao carregar a biblioteca de QR Code. Verifique sua conexão com a internet.');"></script>
+    <!-- Biblioteca QR Code via CDN Confiável -->
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)" onerror="alert('Erro ao carregar a biblioteca de QR Code. Verifique sua conexão com a internet.');"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -640,9 +640,10 @@ function enviarWhatsApp() {
     if (valor) {
         mensagem += " no valor de R$ " + valor;
     }
-    mensagem += ":\n\n" + payload;
+    // Envolve o payload em crases triplas para gerar o bloco de código nativo do WhatsApp com botão de copiar
+    mensagem += ":\n\n```\n" + payload + "\n```";
     
-    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensagem);
+    const url = "[https://api.whatsapp.com/send?text=](https://api.whatsapp.com/send?text=)" + encodeURIComponent(mensagem);
     window.open(url, '_blank');
 }
 
