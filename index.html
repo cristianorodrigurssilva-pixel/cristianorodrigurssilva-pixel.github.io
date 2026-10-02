@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -672,12 +671,11 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // 3. Monta o resumo destacando em negrito e itálico apenas "copiar código Pix"
+    // 3. Monta o resumo com o novo formato aprovado
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
-                           `👇 *O código Pix vai na mensagem abaixo:*\n` +
-                           `Caso não apareça o botão _*copiar código Pix*_, pressione o dedo em cima do código para copiar`;
+                           `👇 O código Pix *cópia e cola* abaixo:`;
 
     // 4. Monta a URL de redirecionamento
     const params = new URLSearchParams();
