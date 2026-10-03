@@ -663,7 +663,7 @@ function atualizarResumoCard() {
         lblNome.innerText = nome;
 
         lblChave.innerText =
-            `${tipo}:${chave}`;
+            `${tipo}: ${chave}`;
 
     } else {
 
@@ -1250,7 +1250,7 @@ function gerarPix() {
         ) {
 
             alert(
-                'A biblioteca do QR Code não carregou. Verifique sua conexão com a internet e tente novamente.'
+                'A biblioteca do QR Code não carregou. Verifique se o arquivo qrcode.min.js está na mesma pasta.'
             );
 
             return;
@@ -1411,7 +1411,7 @@ function copiarPix(
 }
 
 // ============================================================
-// ENVIO PARA WHATSAPP
+// ENVIO PARA WHATSAPP (Fluxo de 2 Mensagens)
 // ============================================================
 
 async function enviarWhatsApp() {
@@ -1437,9 +1437,7 @@ async function enviarWhatsApp() {
     }
 
     /*
-     * Primeiro copiamos o código Pix.
-     * Isso continua preservando a função que
-     * já existia no aplicativo.
+     * Copia o código Pix limpo para a área de transferência
      */
 
     const copiado =
@@ -1464,7 +1462,7 @@ async function enviarWhatsApp() {
     }
 
     mostrarAviso(
-        '✓ Pix copiado! Enviando para o WhatsApp...'
+        '✓ Pix copiado! Cole na próxima mensagem no WhatsApp.'
     );
 
     const nome =
@@ -1483,18 +1481,15 @@ async function enviarWhatsApp() {
         '0,00';
 
     /*
-     * IMPORTANTE:
-     * O código Pix é envolvido por crases triplas (```)
-     * para forçar o WhatsApp a tratá-lo como bloco de código,
-     * impedindo que a parte final vire um link azul.
+     * Envia apenas o resumo explicativo. 
+     * O código Pix já está copiado e pronto para ser colado na mensagem seguinte.
      */
 
     const mensagemResumo =
         `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
         `👤 *Recebedor:* ${nome}\n` +
         `💵 *Valor:* R$ ${valor}\n\n` +
-        `👇 *Código Pix Copia e Cola:*\n\n` +
-        `\`\`\`${pixCode}\`\`\``;
+        `👇 O código Pix *Copia e Cola* está na sua área de transferência, basta colar abaixo:`;
 
     const params =
         new URLSearchParams();
