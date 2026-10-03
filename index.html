@@ -10,8 +10,12 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- Biblioteca QR Code -->
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js](https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js)"></script>
+    <!-- Biblioteca QR Code com Fallback Automático entre CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="
+        let s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';
+        document.head.appendChild(s);
+    "></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -582,18 +586,29 @@ function gerarPix() {
     const qrContainer = document.getElementById('qrcode-container');
     qrContainer.innerHTML = '';
 
+    // Geração segura do QR Code com tolerância a atrasos na rede 4G
     setTimeout(() => {
-        if (typeof QRCode === 'undefined') {
-            alert('A biblioteca do QR Code não carregou. Verifique sua conexão com a internet e tente novamente.');
-            return;
+        if (typeof QRCode !== 'undefined') {
+            new QRCode(qrContainer, { 
+                text: pixCompleto, 
+                width: 180, 
+                height: 180,
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } else {
+            setTimeout(() => {
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, { 
+                        text: pixCompleto, 
+                        width: 180, 
+                        height: 180,
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } else {
+                    alert('A biblioteca do QR Code demorou para carregar devido à conexão. Tente novamente em instantes.');
+                }
+            }, 600);
         }
-
-        new QRCode(qrContainer, { 
-            text: pixCompleto, 
-            width: 180, 
-            height: 180,
-            correctLevel: QRCode.CorrectLevel.M
-        });
     }, 50);
 }
 
@@ -687,7 +702,7 @@ async function enviarWhatsApp() {
     // 4. Monta a URL de redirecionamento
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
-    const urlFinal = `[https://api.whatsapp.com/send?$](https://api.whatsapp.com/send?$){params.toString()}`;
+    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
 
     // 5. Redireciona para o WhatsApp após breve delay
     setTimeout(() => {
