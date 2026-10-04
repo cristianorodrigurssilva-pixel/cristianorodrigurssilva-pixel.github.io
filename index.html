@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
 
-    <!-- Biblioteca QR Code LOCAL -->
-    <script src="./qrcode.min.js"></script>
+    <!-- Biblioteca QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -333,7 +333,6 @@ function carregarDados() {
                     alterarTipoChave();
                 }
             };
-
             store.get("chave").onsuccess = (e) => {
                 if (e.target.result && e.target.result.valor) {
                     document.getElementById('chave').value = e.target.result.valor;
@@ -341,7 +340,6 @@ function carregarDados() {
                     atualizarResumoCard();
                 }
             };
-
             store.get("nome").onsuccess = (e) => {
                 if (e.target.result && e.target.result.valor) {
                     document.getElementById('nome').value = e.target.result.valor;
@@ -349,7 +347,6 @@ function carregarDados() {
                     atualizarResumoCard();
                 }
             };
-
             store.get("cidade").onsuccess = (e) => {
                 if (e.target.result && e.target.result.valor) {
                     document.getElementById('cidade').value = e.target.result.valor;
@@ -464,17 +461,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Formatação do Valor
 document.getElementById('valor').addEventListener('input', function(e) {
     let value = e.target.value.replace(/\D/g, '');
-
     if (!value) {
         e.target.value = '';
         return;
     }
-
-    let options = {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    };
-
+    let options = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
     let result = (parseInt(value, 10) / 100).toLocaleString('pt-BR', options);
     e.target.value = result;
 });
@@ -487,7 +478,6 @@ function CRC16(str) {
 
     for (let c = 0; c < bytes.length; c++) {
         crc ^= bytes[c] << 8;
-
         for (let i = 0; i < 8; i++) {
             if ((crc & 0x8000) !== 0) {
                 crc = (crc << 1) ^ 0x1021;
@@ -496,7 +486,6 @@ function CRC16(str) {
             }
         }
     }
-
     return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
 }
 
@@ -508,17 +497,14 @@ function formatField(id, value) {
 
 function limparTexto(texto) {
     if (!texto) return '';
-
     let t = texto.replace(/&/g, 'E');
     t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     t = t.replace(/[^a-zA-Z0-9 ]/g, "");
-
     return t.trim().toUpperCase();
 }
 
 function tratarChavePixPorTipo(chaveBruta, tipo) {
     if (!chaveBruta) return '';
-
     let c = chaveBruta.trim();
 
     if (tipo === 'EMAIL' || tipo === 'EVP') {
@@ -535,14 +521,9 @@ function tratarChavePixPorTipo(chaveBruta, tipo) {
         if (c.startsWith('+55')) {
             return '+55' + apenasNumeros.substring(2);
         }
-
-        if (
-            (apenasNumeros.length === 12 || apenasNumeros.length === 13) &&
-            apenasNumeros.startsWith('55')
-        ) {
+        if ((apenasNumeros.length === 12 || apenasNumeros.length === 13) && apenasNumeros.startsWith('55')) {
             return '+' + apenasNumeros;
         }
-
         return '+55' + apenasNumeros;
     }
 
@@ -550,26 +531,10 @@ function tratarChavePixPorTipo(chaveBruta, tipo) {
 }
 
 function gerarPix() {
-    let tipo =
-        document.getElementById('tipoChave').value ||
-        localStorage.getItem('pix_perm_tipoChave') ||
-        'CELULAR';
-
-    let chaveBruta =
-        document.getElementById('chave').value ||
-        localStorage.getItem('pix_perm_chave') ||
-        '';
-
-    let nomeOriginal =
-        document.getElementById('nome').value ||
-        localStorage.getItem('pix_perm_nome') ||
-        '';
-
-    let cidadeOriginal =
-        document.getElementById('cidade').value ||
-        localStorage.getItem('pix_perm_cidade') ||
-        '';
-
+    let tipo = document.getElementById('tipoChave').value || localStorage.getItem('pix_perm_tipoChave') || 'CELULAR';
+    let chaveBruta = document.getElementById('chave').value || localStorage.getItem('pix_perm_chave') || '';
+    let nomeOriginal = document.getElementById('nome').value || localStorage.getItem('pix_perm_nome') || '';
+    let cidadeOriginal = document.getElementById('cidade').value || localStorage.getItem('pix_perm_cidade') || '';
     let valorInput = document.getElementById('valor').value;
 
     let chave = tratarChavePixPorTipo(chaveBruta, tipo);
@@ -583,40 +548,26 @@ function gerarPix() {
         return;
     }
 
-    let payload =
-        formatField('00', '01') +
-        formatField('01', '12');
+    let payload = formatField('00', '01') + formatField('01', '12');
 
-    let merchantAccount =
-        formatField('00', 'BR.GOV.BCB.PIX') +
-        formatField('01', chave);
-
+    let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     payload += formatField('26', merchantAccount);
 
-    payload +=
-        formatField('52', '0000') +
-        formatField('53', '986');
+    payload += formatField('52', '0000') + formatField('53', '986');
 
     if (valorInput) {
-        let valorTratado = valorInput
-            .replace(/\./g, '')
-            .replace(',', '.')
-            .trim();
-
+        let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
         let valorNum = parseFloat(valorTratado);
-
         if (!isNaN(valorNum) && valorNum > 0) {
             payload += formatField('54', valorNum.toFixed(2));
         }
     }
 
-    payload +=
-        formatField('58', 'BR') +
-        formatField('59', nome) +
-        formatField('60', cidade);
+    payload += formatField('58', 'BR') + 
+               formatField('59', nome) + 
+               formatField('60', cidade);
 
     let txidField = formatField('05', '***');
-
     payload += formatField('62', txidField);
 
     payload += '6304';
@@ -628,19 +579,18 @@ function gerarPix() {
     resultBox.style.display = 'block';
 
     document.getElementById('pix-payload').value = pixCompleto;
-
     const qrContainer = document.getElementById('qrcode-container');
     qrContainer.innerHTML = '';
 
     setTimeout(() => {
         if (typeof QRCode === 'undefined') {
-            alert('A biblioteca do QR Code não carregou. Verifique se o arquivo qrcode.min.js está no mesmo diretório do index.html.');
+            alert('A biblioteca do QR Code não carregou. Verifique sua conexão com a internet e tente novamente.');
             return;
         }
 
-        new QRCode(qrContainer, {
-            text: pixCompleto,
-            width: 180,
+        new QRCode(qrContainer, { 
+            text: pixCompleto, 
+            width: 180, 
             height: 180,
             correctLevel: QRCode.CorrectLevel.M
         });
@@ -650,10 +600,9 @@ function gerarPix() {
 function mostrarAviso(mensagemPersonalizada) {
     const toast = document.getElementById('toast');
     const btn = document.getElementById('btn-copiar');
-
+    
     toast.innerText = mensagemPersonalizada || '✓ Código Pix copiado!';
     toast.classList.add('show');
-
     btn.innerText = '✓ Código Copiado!';
     btn.style.backgroundColor = '#06b6d4';
     btn.style.color = '#0f172a';
@@ -675,14 +624,12 @@ async function copiarParaClipboardAssincrono(texto) {
             return false;
         }
     }
-
     return false;
 }
 
 function copiarPix(silencioso = false) {
     const payloadInput = document.getElementById('pix-payload');
     const texto = payloadInput ? payloadInput.value.trim() : '';
-
     if (!texto) return;
 
     payloadInput.focus();
@@ -694,14 +641,11 @@ function copiarPix(silencioso = false) {
                 document.execCommand('copy');
             } catch (e) {}
         }
-
-        if (!silencioso) {
-            mostrarAviso();
-        }
+        if (!silencioso) mostrarAviso();
     });
 }
 
-// --- ENVIO PARA WHATSAPP ---
+// --- ENVIO EM 2 ETAPAS ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -711,9 +655,8 @@ async function enviarWhatsApp() {
         return;
     }
 
-    // Copia o código Pix para a área de transferência
+    // 1. Copia o código Pix para a área de transferência do celular
     const copiado = await copiarParaClipboardAssincrono(pixCode);
-
     if (!copiado) {
         try {
             payloadInput.focus();
@@ -722,68 +665,46 @@ async function enviarWhatsApp() {
         } catch (e) {}
     }
 
-    mostrarAviso('✓ Pix copiado! O código também será enviado na mensagem.');
+    // 2. Notifica com o toast
+    mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
 
-    const nome =
-        localStorage.getItem('pix_perm_nome') ||
-        document.getElementById('nome').value ||
-        'Recebedor';
+    const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
+    const valor = document.getElementById('valor').value || '0,00';
 
-    const valor =
-        document.getElementById('valor').value ||
-        '0,00';
+    // 3. Monta o resumo com o novo formato aprovado
+    const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
+                           `👤 *Recebedor:* ${nome}\n` +
+                           `💵 *Valor:* R$ ${valor}\n\n` +
+                           `👇 O código Pix *cópia e cola* abaixo:`;
 
-    /*
-     * IMPORTANTE:
-     * O código Pix completo é colocado dentro da mensagem.
-     * Isso permite que o WhatsApp reconheça o conteúdo
-     * como código Pix e disponibilize o recurso de
-     * copiar código Pix.
-     */
-    const mensagemResumo =
-        `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
-        `👤 *Recebedor:* ${nome}\n` +
-        `💵 *Valor:* R$ ${valor}\n\n` +
-        `👇 *Código Pix cópia e cola:*\n\n` +
-        `${pixCode}`;
-
+    // 4. Monta a URL de redirecionamento
     const params = new URLSearchParams();
     params.append('text', mensagemResumo);
+    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
 
-    const urlFinal =
-        `https://api.whatsapp.com/send?${params.toString()}`;
-
+    // 5. Redireciona para o WhatsApp após breve delay
     setTimeout(() => {
         window.location.href = urlFinal;
     }, 200);
 }
 
-// --- SERVICE WORKER ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker
-            .register('./sw.js')
-            .catch(function(err) {});
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {});
     });
 }
 
-// --- INSTALAÇÃO PWA ---
 let deferredPrompt;
-
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-
     document.getElementById('btn-instalar').style.display = 'block';
 });
 
 document.getElementById('btn-instalar').addEventListener('click', (e) => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
-
-        deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
-        });
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
     }
 });
 </script>
