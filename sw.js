@@ -1,11 +1,12 @@
-const CACHE_NAME = 'qrpix-v6';
+const CACHE_NAME = 'qrpix-v7';
+
 const ASSETS = [
     './',
     './index.html',
     './manifest.json',
     './icon-192.png',
     './icon-512.png',
-    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
+    './qrcode.min.js'
 ];
 
 self.addEventListener('install', (event) => {
