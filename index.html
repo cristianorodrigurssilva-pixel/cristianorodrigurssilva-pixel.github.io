@@ -550,7 +550,7 @@ function gerarPix() {
 
     let payload = formatField('00', '01');
 
-    // CORREÇÃO APLICADA: 'br.gov.bcb.pix' agora está estritamente em minúsculo para ativar o WhatsApp
+    // Tag 26 com br.gov.bcb.pix estritamente em minúsculo
     let merchantAccount = formatField('00', 'br.gov.bcb.pix') + formatField('01', chave);
     payload += formatField('26', merchantAccount);
 
@@ -647,7 +647,7 @@ function copiarPix(silencioso = false) {
     });
 }
 
-// --- ENVIO EM 2 ETAPAS ---
+// --- ENVIO VIA COMPARTILHAMENTO NATIVO (WEB SHARE API) ---
 async function enviarWhatsApp() {
     const payloadInput = document.getElementById('pix-payload');
     const pixCode = payloadInput ? payloadInput.value.trim() : '';
@@ -657,32 +657,42 @@ async function enviarWhatsApp() {
         return;
     }
 
-    const copiado = await copiarParaClipboardAssincrono(pixCode);
-    if (!copiado) {
-        try {
-            payloadInput.focus();
-            payloadInput.select();
-            document.execCommand('copy');
-        } catch (e) {}
-    }
-
-    mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
+    // Copia preventivamente para o clipboard para garantir
+    await copiarParaClipboardAssincrono(pixCode);
 
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
+    const mensagemCompleta = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
-                           `👇 O código Pix *cópia e cola* abaixo:`;
+                           `👇 Copie o código abaixo:\n` +
+                           `${pixCode}`;
 
+    // Tenta usar o compartilhamento nativo do dispositivo
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Pagamento Pix',
+                text: mensagemCompleta
+            });
+            mostrarAviso('✓ Compartilhado com sucesso!');
+            return;
+        } catch (err) {
+            // Se o usuário cancelar a gaveta de compartilhamento, não exibe erro crítico
+            if (err.name !== 'AbortError') {
+                console.error('Erro ao compartilhar:', err);
+            }
+            return;
+        }
+    }
+
+    // Fallback caso o navegador não suporte navigator.share (ex: navegadores de PC antigos)
+    mostrarAviso('✓ Pix copiado! Cole no WhatsApp.');
     const params = new URLSearchParams();
-    params.append('text', mensagemResumo);
+    params.append('text', mensagemCompleta);
     const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
-
-    setTimeout(() => {
-        window.location.href = urlFinal;
-    }, 200);
+    window.open(urlFinal, '_blank');
 }
 
 if ('serviceWorker' in navigator) {
