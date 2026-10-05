@@ -567,7 +567,9 @@ function gerarPix() {
                formatField('59', nome) + 
                formatField('60', cidade);
 
-    let txidField = formatField('05', '***');
+    // TxID dinâmico e aleatório para variar o CRC16 a cada geração
+    let txidAleatorio = 'QR' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    let txidField = formatField('05', txidAleatorio);
     payload += formatField('62', txidField);
 
     payload += '6304';
@@ -671,7 +673,7 @@ async function enviarWhatsApp() {
     const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
     const valor = document.getElementById('valor').value || '0,00';
 
-    // 3. Monta o resumo com o novo formato aprovado
+    // 3. Monta o resumo com o formato aprovado
     const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
                            `👤 *Recebedor:* ${nome}\n` +
                            `💵 *Valor:* R$ ${valor}\n\n` +
