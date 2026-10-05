@@ -548,7 +548,8 @@ function gerarPix() {
         return;
     }
 
-    let payload = formatField('00', '01') + formatField('01', '12');
+    // CORREÇÃO APLICADA: Removida a tag 01 redundante, iniciando diretamente com a tag 00
+    let payload = formatField('00', '01');
 
     let merchantAccount = formatField('00', 'BR.GOV.BCB.PIX') + formatField('01', chave);
     payload += formatField('26', merchantAccount);
