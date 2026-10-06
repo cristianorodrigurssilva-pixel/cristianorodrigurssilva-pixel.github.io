@@ -594,76 +594,102 @@
         }
 
         // ============================================================
-        // GERAÇÃO DO PIX
-        // ============================================================
-        function gerarPix() {
-            let tipo = document.getElementById('tipoChave').value || localStorage.getItem('pix_perm_tipoChave') || 'CELULAR';
-            let chaveBruta = document.getElementById('chave').value || localStorage.getItem('pix_perm_chave') || '';
-            let nomeOriginal = document.getElementById('nome').value || localStorage.getItem('pix_perm_nome') || '';
-            let cidadeOriginal = document.getElementById('cidade').value || localStorage.getItem('pix_perm_cidade') || '';
-            let valorInput = document.getElementById('valor').value;
+// GERAÇÃO DO PIX
+// ============================================================
+function gerarPix() {
+    let tipo = document.getElementById('tipoChave').value || localStorage.getItem('pix_perm_tipoChave') || 'CELULAR';
+    let chaveBruta = document.getElementById('chave').value || localStorage.getItem('pix_perm_chave') || '';
+    let nomeOriginal = document.getElementById('nome').value || localStorage.getItem('pix_perm_nome') || '';
+    let cidadeOriginal = document.getElementById('cidade').value || localStorage.getItem('pix_perm_cidade') || '';
+    let valorInput = document.getElementById('valor').value;
 
-            let chave = tratarChavePixPorTipo(chaveBruta, tipo);
-            let nome = limparTexto(nomeOriginal).substring(0, 25);
-            let cidade = limparTexto(cidadeOriginal).substring(0, 15);
+    let chave = tratarChavePixPorTipo(chaveBruta, tipo);
+    let nome = limparTexto(nomeOriginal).substring(0, 25);
+    let cidade = limparTexto(cidadeOriginal).substring(0, 15);
 
-            if (!chave || !nome || !cidade) {
-                alert('Por favor, preencha todos os dados do recebedor (Chave, Nome e Cidade).');
-                document.getElementById('config-box').style.display = 'block';
-                document.getElementById('btn-alterar-texto').innerText = 'Cancelar';
-                return;
-            }
+    if (!chave || !nome || !cidade) {
+        alert('Por favor, preencha todos os dados do recebedor (Chave, Nome e Cidade).');
+        document.getElementById('config-box').style.display = 'block';
+        document.getElementById('btn-alterar-texto').innerText = 'Cancelar';
+        return;
+    }
 
-            let payload = formatField('00', '01');
+    // Início do payload Pix
+    let payload = formatField('00', '01');
 
-            let merchantAccount = formatField('00', 'br.gov.bcb.pix') + formatField('01', chave);
-            payload += formatField('26', merchantAccount);
+    // QR Code reutilizável / estático
+    payload += formatField('01', '11');
 
-            payload += formatField('52', '0000');
-            payload += formatField('53', '986');
+    // Merchant Account Information
+    let merchantAccount =
+        formatField('00', 'br.gov.bcb.pix') +
+        formatField('01', chave);
 
-            if (valorInput) {
-                let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
-                let valorNum = parseFloat(valorTratado);
+    payload += formatField('26', merchantAccount);
 
-                if (!isNaN(valorNum) && valorNum > 0) {
-                    payload += formatField('54', valorNum.toFixed(2));
-                }
-            }
+    // Merchant Category Code
+    payload += formatField('52', '0000');
 
-            payload += formatField('58', 'BR');
-            payload += formatField('59', nome);
-            payload += formatField('60', cidade);
+    // Moeda: Real brasileiro
+    payload += formatField('53', '986');
 
-            let txidAleatorio = 'QR' + Math.random().toString(36).substring(2, 10).toUpperCase();
-            let txidField = formatField('05', txidAleatorio);
-            payload += formatField('62', txidField);
+    // Valor
+    if (valorInput) {
+        let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
+        let valorNum = parseFloat(valorTratado);
 
-            payload += '6304';
-            const crc = CRC16(payload);
-            const pixCompleto = payload + crc;
-
-            const resultBox = document.getElementById('result');
-            resultBox.style.display = 'block';
-            document.getElementById('pix-payload').value = pixCompleto;
-
-            const qrContainer = document.getElementById('qrcode-container');
-            qrContainer.innerHTML = '';
-
-            setTimeout(() => {
-                if (typeof QRCode === 'undefined') {
-                    alert('A biblioteca do QR Code não carregou. Verifique se o arquivo qrcode.min.js está na mesma pasta do index.html.');
-                    return;
-                }
-
-                new QRCode(qrContainer, {
-                    text: pixCompleto,
-                    width: 180,
-                    height: 180,
-                    correctLevel: QRCode.CorrectLevel.M
-                });
-            }, 50);
+        if (!isNaN(valorNum) && valorNum > 0) {
+            payload += formatField('54', valorNum.toFixed(2));
         }
+    }
+
+    // País
+    payload += formatField('58', 'BR');
+
+    // Nome do recebedor
+    payload += formatField('59', nome);
+
+    // Cidade
+    payload += formatField('60', cidade);
+
+    // TXID
+    let txidAleatorio =
+        'QR' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    let txidField = formatField('05', txidAleatorio);
+
+    payload += formatField('62', txidField);
+
+    // CRC16
+    payload += '6304';
+
+    const crc = CRC16(payload);
+    const pixCompleto = payload + crc;
+
+    // Mostra resultado
+    const resultBox = document.getElementById('result');
+    resultBox.style.display = 'block';
+
+    document.getElementById('pix-payload').value = pixCompleto;
+
+    // Gera QR Code
+    const qrContainer = document.getElementById('qrcode-container');
+    qrContainer.innerHTML = '';
+
+    setTimeout(() => {
+        if (typeof QRCode === 'undefined') {
+            alert('A biblioteca do QR Code não carregou. Verifique se o arquivo qrcode.min.js está na mesma pasta do index.html.');
+            return;
+        }
+
+        new QRCode(qrContainer, {
+            text: pixCompleto,
+            width: 180,
+            height: 180,
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }, 50);
+}
 
         // ============================================================
         // AVISO DE CÓPIA
