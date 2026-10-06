@@ -3,16 +3,20 @@ const CACHE_NAME = 'qrpix-v7';
 const ASSETS = [
     './',
     './index.html',
+    './qrcode.min.js',
     './manifest.json',
+    './icon.svg',
     './icon-192.png',
-    './icon-512.png',
-    './qrcode.min.js'
+    './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS);
+        })
     );
+
     self.skipWaiting();
 });
 
@@ -28,6 +32,7 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+
     self.clients.claim();
 });
 
