@@ -1,292 +1,380 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html><html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QrPix</title>
+    <title>QrPix</title><!-- Configurações PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
+
+<!-- Biblioteca QR Code LOCAL -->
+<script src="./qrcode.min.js"></script>
+
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     
-    <!-- Configurações PWA -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#2563eb">
-    <link rel="icon" type="image/svg+xml" href="./icon.svg?v=2">
-
-    <!-- Biblioteca QR Code -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    body { 
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+        padding: 20px; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center;
+        min-height: 100vh;
+    }
     
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        
-        body { 
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        .container { 
-            background: #ffffff; 
-            padding: 25px; 
-            border-radius: 20px; 
-            max-width: 420px; 
-            width: 100%; 
-            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12); 
-            border: 1px solid #bfdbfe;
-            position: relative;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .container { 
+        background: #ffffff; 
+        padding: 25px; 
+        border-radius: 20px; 
+        max-width: 420px; 
+        width: 100%; 
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12); 
+        border: 1px solid #bfdbfe;
+        position: relative;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        h1 { 
-            font-size: 32px; 
-            font-weight: 800; 
-            color: #1e3a8a; 
-            letter-spacing: 0.5px;
-        }
-        .pix-color { color: #06b6d4; }
+    h1 { 
+        font-size: 32px; 
+        font-weight: 800; 
+        color: #1e3a8a; 
+        letter-spacing: 0.5px;
+    }
+    .pix-color { color: #06b6d4; }
 
-        /* Cartão Discreto do Recebedor */
-        .card-recebedor {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .card-recebedor {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-        .recebedor-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-            padding-right: 10px;
-        }
+    .recebedor-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        overflow: hidden;
+        padding-right: 10px;
+    }
 
-        .recebedor-nome {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1e3a8a;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .recebedor-nome {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e3a8a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-        .recebedor-chave {
-            font-size: 12px;
-            color: #64748b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .recebedor-chave {
+        font-size: 12px;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-        .btn-alterar {
-            background: none;
-            border: none;
-            color: #2563eb;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: background 0.2s;
-            width: auto;
-            margin: 0;
-            line-height: normal;
-        }
-        .btn-alterar:hover {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
+    .btn-alterar {
+        background: none;
+        border: none;
+        color: #2563eb;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+        width: auto;
+        margin: 0;
+        line-height: normal;
+    }
 
-        label { font-size: 14px; font-weight: 700; color: #1e3a8a; display: block; margin-top: 14px; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            margin-top: 6px; 
-            border: 2px solid #bfdbfe; 
-            border-radius: 10px; 
-            font-size: 18px; 
-            background: #f8fafc; 
-            color: #1e293b;
-            transition: all 0.2s;
-        }
-        
-        .input-valor {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            color: #2563eb;
-        }
+    .btn-alterar:hover {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2563eb;
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
-        }
+    label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e3a8a;
+        display: block;
+        margin-top: 14px;
+    }
+    
+    input, select { 
+        width: 100%; 
+        padding: 14px; 
+        margin-top: 6px; 
+        border: 2px solid #bfdbfe; 
+        border-radius: 10px; 
+        font-size: 18px; 
+        background: #f8fafc; 
+        color: #1e293b;
+        transition: all 0.2s;
+    }
+    
+    .input-valor {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        color: #2563eb;
+    }
 
-        button.btn-principal { 
-            width: 100%; 
-            padding: 14px; 
-            background-color: #2563eb; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            margin-top: 16px; 
-            cursor: pointer; 
-            transition: background 0.2s, transform 0.1s;
-        }
-        button.btn-principal:hover { background-color: #1d4ed8; }
-        button.btn-principal:active { transform: scale(0.99); }
-        
-        .btn-whatsapp { background-color: #25d366 !important; color: white; margin-top: 10px; }
-        .btn-whatsapp:hover { background-color: #1eb954 !important; }
-        
-        #btn-instalar { background-color: #0f172a; color: white; display: none; margin-top: 15px; }
-        
-        #qrcode-container { 
-            margin-top: 20px; 
-            display: flex; 
-            justify-content: center; 
-            background: #ffffff; 
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px dashed #38bdf8;
-        }
-        
-        .result-box { display: none; margin-top: 15px; }
-        
-        textarea { 
-            width: 100%; 
-            height: 75px; 
-            margin-top: 8px; 
-            padding: 10px; 
-            border-radius: 10px; 
-            border: 2px solid #bfdbfe; 
-            font-family: monospace; 
-            font-size: 11px; 
-            resize: none; 
-            background: #f8fafc; 
-            color: #1e3a8a;
-        }
+    input:focus, select:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+    }
 
-        .config-box {
-            display: none;
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #cbd5e1;
-        }
+    button.btn-principal { 
+        width: 100%; 
+        padding: 14px; 
+        background-color: #2563eb; 
+        color: white; 
+        border: none; 
+        border-radius: 10px; 
+        font-size: 16px; 
+        font-weight: bold; 
+        margin-top: 16px; 
+        cursor: pointer; 
+        transition: background 0.2s, transform 0.1s;
+    }
 
-        .toast {
-            display: none;
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #06b6d4;
-            color: #0f172a;
-            padding: 14px 24px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-            z-index: 9999;
-            text-align: center;
-            white-space: nowrap;
-        }
-        .toast.show { display: block; }
-    </style>
+    button.btn-principal:hover {
+        background-color: #1d4ed8;
+    }
+
+    button.btn-principal:active {
+        transform: scale(0.99);
+    }
+    
+    .btn-whatsapp {
+        background-color: #25d366 !important;
+        color: white;
+        margin-top: 10px;
+    }
+
+    .btn-whatsapp:hover {
+        background-color: #1eb954 !important;
+    }
+    
+    #btn-instalar {
+        background-color: #0f172a;
+        color: white;
+        display: none;
+        margin-top: 15px;
+    }
+    
+    #qrcode-container { 
+        margin-top: 20px; 
+        display: flex; 
+        justify-content: center; 
+        background: #ffffff; 
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px dashed #38bdf8;
+    }
+    
+    .result-box {
+        display: none;
+        margin-top: 15px;
+    }
+    
+    textarea { 
+        width: 100%; 
+        height: 75px; 
+        margin-top: 8px; 
+        padding: 10px; 
+        border-radius: 10px; 
+        border: 2px solid #bfdbfe; 
+        font-family: monospace; 
+        font-size: 11px; 
+        resize: none; 
+        background: #f8fafc; 
+        color: #1e3a8a;
+    }
+
+    .config-box {
+        display: none;
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #cbd5e1;
+    }
+
+    .toast {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #06b6d4;
+        color: #0f172a;
+        padding: 14px 24px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        z-index: 9999;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .toast.show {
+        display: block;
+    }
+</style>
+
 </head>
-<body>
-
-<div class="container">
+<body><div class="container">
     <div class="header">
         <h1>Qr<span class="pix-color">Pix</span></h1>
+    </div><!-- Resumo Sutil do Recebedor -->
+<div class="card-recebedor">
+    <div class="recebedor-info">
+        <span class="recebedor-nome" id="resumo-nome">Sem recebedor cadastrado</span>
+        <span class="recebedor-chave" id="resumo-chave">Clique para configurar seus dados</span>
     </div>
 
-    <!-- Resumo Sutil do Recebedor -->
-    <div class="card-recebedor">
-        <div class="recebedor-info">
-            <span class="recebedor-nome" id="resumo-nome">Sem recebedor cadastrado</span>
-            <span class="recebedor-chave" id="resumo-chave">Clique para configurar seus dados</span>
-        </div>
-        <button type="button" class="btn-alterar" onclick="toggleConfig()" id="btn-alterar-texto">Alterar</button>
-    </div>
-
-    <!-- Painel de Configurações do Recebedor -->
-    <div id="config-box" class="config-box">
-        <label for="tipoChave" style="margin-top: 0;">Tipo de Chave Pix:</label>
-        <select id="tipoChave" onchange="alterarTipoChave()">
-            <option value="CELULAR">Celular</option>
-            <option value="CPF">CPF</option>
-            <option value="CNPJ">CNPJ</option>
-            <option value="EMAIL">E-mail</option>
-            <option value="EVP">Chave Aleatória (EVP)</option>
-        </select>
-
-        <label for="chave" id="labelChave">Chave Pix:</label>
-        <input type="text" id="chave" placeholder="(00) 00000-0000">
-
-        <label for="nome">Nome do Recebedor:</label>
-        <input type="text" id="nome" placeholder="Seu Nome">
-
-        <label for="cidade">Cidade:</label>
-        <input type="text" id="cidade" placeholder="Sua Cidade">
-
-        <button type="button" class="btn-principal" onclick="salvarEFecharConfig()" style="background-color: #0f172a; margin-top: 14px;">Salvar Dados</button>
-    </div>
-
-    <!-- Tela Principal -->
-    <label for="valor">Digite o Valor (R$):</label>
-    <input type="text" id="valor" class="input-valor" placeholder="0,00" inputmode="numeric" autofocus>
-
-    <button type="button" class="btn-principal" onclick="gerarPix()">Gerar PIX</button>
-
-    <div id="result" class="result-box">
-        <div id="qrcode-container"></div>
-        
-        <label for="pix-payload">Código Pix Copia e Cola:</label>
-        <textarea id="pix-payload" readonly></textarea>
-        
-        <button type="button" class="btn-principal btn-whatsapp" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
-        <button type="button" id="btn-copiar" class="btn-principal" onclick="copiarPix()">Copiar Código Pix</button>
-    </div>
-
-    <button type="button" id="btn-instalar" class="btn-principal">Instalar App no Celular</button>
+    <button
+        type="button"
+        class="btn-alterar"
+        onclick="toggleConfig()"
+        id="btn-alterar-texto">
+        Alterar
+    </button>
 </div>
 
-<div id="toast" class="toast">✓ Código Pix copiado!</div>
+<!-- Painel de Configurações do Recebedor -->
+<div id="config-box" class="config-box">
+    <label for="tipoChave" style="margin-top: 0;">Tipo de Chave Pix:</label>
 
-<script>
-// --- SISTEMA DE ARMAZENAMENTO DUPLO E PERMANENTE ---
+    <select id="tipoChave" onchange="alterarTipoChave()">
+        <option value="CELULAR">Celular</option>
+        <option value="CPF">CPF</option>
+        <option value="CNPJ">CNPJ</option>
+        <option value="EMAIL">E-mail</option>
+        <option value="EVP">Chave Aleatória (EVP)</option>
+    </select>
+
+    <label for="chave" id="labelChave">Chave Pix:</label>
+    <input
+        type="text"
+        id="chave"
+        placeholder="(00) 00000-0000">
+
+    <label for="nome">Nome do Recebedor:</label>
+    <input
+        type="text"
+        id="nome"
+        placeholder="Seu Nome">
+
+    <label for="cidade">Cidade:</label>
+    <input
+        type="text"
+        id="cidade"
+        placeholder="Sua Cidade">
+
+    <button
+        type="button"
+        class="btn-principal"
+        onclick="salvarEFecharConfig()"
+        style="background-color: #0f172a; margin-top: 14px;">
+        Salvar Dados
+    </button>
+</div>
+
+<!-- Tela Principal -->
+<label for="valor">Digite o Valor (R$):</label>
+
+<input
+    type="text"
+    id="valor"
+    class="input-valor"
+    placeholder="0,00"
+    inputmode="numeric"
+    autofocus>
+
+<button
+    type="button"
+    class="btn-principal"
+    onclick="gerarPix()">
+    Gerar PIX
+</button>
+
+<div id="result" class="result-box">
+    <div id="qrcode-container"></div>
+    
+    <label for="pix-payload">Código Pix Copia e Cola:</label>
+
+    <textarea
+        id="pix-payload"
+        readonly></textarea>
+    
+    <button
+        type="button"
+        class="btn-principal btn-whatsapp"
+        onclick="enviarWhatsApp()">
+        Enviar por WhatsApp
+    </button>
+
+    <button
+        type="button"
+        id="btn-copiar"
+        class="btn-principal"
+        onclick="copiarPix()">
+        Copiar Código Pix
+    </button>
+</div>
+
+<button
+    type="button"
+    id="btn-instalar"
+    class="btn-principal">
+    Instalar App no Celular
+</button>
+
+</div><div id="toast" class="toast">✓ Código Pix copiado!</div><script>
+
+// ============================================================
+// SISTEMA DE ARMAZENAMENTO DUPLO E PERMANENTE
+// ============================================================
+
 let db;
 const dbName = "QrPixDatabase_V2";
 
 function iniciarBanco() {
     return new Promise((resolve) => {
+
         const request = indexedDB.open(dbName, 1);
+
         request.onupgradeneeded = function(e) {
+
             let dbInstance = e.target.result;
+
             if (!dbInstance.objectStoreNames.contains("dados")) {
-                dbInstance.createObjectStore("dados", { keyPath: "campo" });
+                dbInstance.createObjectStore("dados", {
+                    keyPath: "campo"
+                });
             }
         };
+
         request.onsuccess = function(e) {
             db = e.target.result;
             resolve();
         };
+
         request.onerror = function() {
             resolve();
         };
@@ -294,114 +382,215 @@ function iniciarBanco() {
 }
 
 function salvarDado(campo, valor) {
+
     try {
         localStorage.setItem('pix_perm_' + campo, valor);
     } catch (e) {}
 
     if (db) {
+
         try {
+
             const tx = db.transaction("dados", "readwrite");
             const store = tx.objectStore("dados");
-            store.put({ campo: campo, valor: valor });
+
+            store.put({
+                campo: campo,
+                valor: valor
+            });
+
         } catch (err) {}
     }
+
     atualizarResumoCard();
 }
 
 function carregarDados() {
+
     let tipo = localStorage.getItem('pix_perm_tipoChave');
     let chave = localStorage.getItem('pix_perm_chave');
     let nome = localStorage.getItem('pix_perm_nome');
     let cidade = localStorage.getItem('pix_perm_cidade');
 
-    if (tipo) document.getElementById('tipoChave').value = tipo;
+    if (tipo) {
+        document.getElementById('tipoChave').value = tipo;
+    }
+
     alterarTipoChave();
 
-    if (chave) document.getElementById('chave').value = chave;
-    if (nome) document.getElementById('nome').value = nome;
-    if (cidade) document.getElementById('cidade').value = cidade;
+    if (chave) {
+        document.getElementById('chave').value = chave;
+    }
+
+    if (nome) {
+        document.getElementById('nome').value = nome;
+    }
+
+    if (cidade) {
+        document.getElementById('cidade').value = cidade;
+    }
 
     if (db) {
+
         try {
+
             const tx = db.transaction("dados", "readonly");
             const store = tx.objectStore("dados");
-            
+
             store.get("tipoChave").onsuccess = (e) => {
+
                 if (e.target.result && e.target.result.valor) {
-                    document.getElementById('tipoChave').value = e.target.result.valor;
-                    localStorage.setItem('pix_perm_tipoChave', e.target.result.valor);
+
+                    document.getElementById('tipoChave').value =
+                        e.target.result.valor;
+
+                    localStorage.setItem(
+                        'pix_perm_tipoChave',
+                        e.target.result.valor
+                    );
+
                     alterarTipoChave();
                 }
             };
+
             store.get("chave").onsuccess = (e) => {
+
                 if (e.target.result && e.target.result.valor) {
-                    document.getElementById('chave').value = e.target.result.valor;
-                    localStorage.setItem('pix_perm_chave', e.target.result.valor);
+
+                    document.getElementById('chave').value =
+                        e.target.result.valor;
+
+                    localStorage.setItem(
+                        'pix_perm_chave',
+                        e.target.result.valor
+                    );
+
                     atualizarResumoCard();
                 }
             };
+
             store.get("nome").onsuccess = (e) => {
+
                 if (e.target.result && e.target.result.valor) {
-                    document.getElementById('nome').value = e.target.result.valor;
-                    localStorage.setItem('pix_perm_nome', e.target.result.valor);
+
+                    document.getElementById('nome').value =
+                        e.target.result.valor;
+
+                    localStorage.setItem(
+                        'pix_perm_nome',
+                        e.target.result.valor
+                    );
+
                     atualizarResumoCard();
                 }
             };
+
             store.get("cidade").onsuccess = (e) => {
+
                 if (e.target.result && e.target.result.valor) {
-                    document.getElementById('cidade').value = e.target.result.valor;
-                    localStorage.setItem('pix_perm_cidade', e.target.result.valor);
+
+                    document.getElementById('cidade').value =
+                        e.target.result.valor;
+
+                    localStorage.setItem(
+                        'pix_perm_cidade',
+                        e.target.result.valor
+                    );
                 }
             };
+
         } catch (err) {}
     }
 
     atualizarResumoCard();
 
     if (!chave || !nome || !cidade) {
+
         document.getElementById('config-box').style.display = 'block';
-        document.getElementById('btn-alterar-texto').innerText = 'Cancelar';
+
+        document.getElementById('btn-alterar-texto').innerText =
+            'Cancelar';
     }
 }
 
 function atualizarResumoCard() {
-    let nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value;
-    let chave = localStorage.getItem('pix_perm_chave') || document.getElementById('chave').value;
-    let tipo = localStorage.getItem('pix_perm_tipoChave') || document.getElementById('tipoChave').value || 'Chave';
 
-    const lblNome = document.getElementById('resumo-nome');
-    const lblChave = document.getElementById('resumo-chave');
+    let nome =
+        localStorage.getItem('pix_perm_nome') ||
+        document.getElementById('nome').value;
+
+    let chave =
+        localStorage.getItem('pix_perm_chave') ||
+        document.getElementById('chave').value;
+
+    let tipo =
+        localStorage.getItem('pix_perm_tipoChave') ||
+        document.getElementById('tipoChave').value ||
+        'Chave';
+
+    const lblNome =
+        document.getElementById('resumo-nome');
+
+    const lblChave =
+        document.getElementById('resumo-chave');
 
     if (nome && chave) {
+
         lblNome.innerText = nome;
-        lblChave.innerText = `${tipo}: ${chave}`;
+
+        lblChave.innerText =
+            `${tipo}: ${chave}`;
+
     } else {
-        lblNome.innerText = 'Sem recebedor cadastrado';
-        lblChave.innerText = 'Clique para configurar seus dados';
+
+        lblNome.innerText =
+            'Sem recebedor cadastrado';
+
+        lblChave.innerText =
+            'Clique para configurar seus dados';
     }
 }
 
 function toggleConfig() {
-    const box = document.getElementById('config-box');
-    const btnText = document.getElementById('btn-alterar-texto');
-    
+
+    const box =
+        document.getElementById('config-box');
+
+    const btnText =
+        document.getElementById('btn-alterar-texto');
+
     if (box.style.display === 'block') {
+
         box.style.display = 'none';
         btnText.innerText = 'Alterar';
+
     } else {
+
         box.style.display = 'block';
         btnText.innerText = 'Cancelar';
     }
 }
 
 function salvarEFecharConfig() {
-    let tipo = document.getElementById('tipoChave').value;
-    let chave = document.getElementById('chave').value.trim();
-    let nome = document.getElementById('nome').value.trim();
-    let cidade = document.getElementById('cidade').value.trim();
+
+    let tipo =
+        document.getElementById('tipoChave').value;
+
+    let chave =
+        document.getElementById('chave').value.trim();
+
+    let nome =
+        document.getElementById('nome').value.trim();
+
+    let cidade =
+        document.getElementById('cidade').value.trim();
 
     if (!chave || !nome || !cidade) {
-        alert('Por favor, preencha todos os dados do recebedor.');
+
+        alert(
+            'Por favor, preencha todos os dados do recebedor.'
+        );
+
         return;
     }
 
@@ -410,301 +599,846 @@ function salvarEFecharConfig() {
     salvarDado('nome', nome);
     salvarDado('cidade', cidade);
 
-    document.getElementById('config-box').style.display = 'none';
-    document.getElementById('btn-alterar-texto').innerText = 'Alterar';
+    document.getElementById('config-box').style.display =
+        'none';
+
+    document.getElementById('btn-alterar-texto').innerText =
+        'Alterar';
 }
 
 function alterarTipoChave() {
-    const tipo = document.getElementById('tipoChave').value;
-    const label = document.getElementById('labelChave');
-    const input = document.getElementById('chave');
+
+    const tipo =
+        document.getElementById('tipoChave').value;
+
+    const label =
+        document.getElementById('labelChave');
+
+    const input =
+        document.getElementById('chave');
 
     salvarDado('tipoChave', tipo);
 
     if (tipo === 'CELULAR') {
-        label.innerText = 'Chave Pix (DDD + Número):';
-        input.placeholder = '(00) 00000-0000';
+
+        label.innerText =
+            'Chave Pix (DDD + Número):';
+
+        input.placeholder =
+            '(00) 00000-0000';
+
     } else if (tipo === 'CPF') {
-        label.innerText = 'Chave Pix (CPF):';
-        input.placeholder = '000.000.000-00';
+
+        label.innerText =
+            'Chave Pix (CPF):';
+
+        input.placeholder =
+            '000.000.000-00';
+
     } else if (tipo === 'CNPJ') {
-        label.innerText = 'Chave Pix (CNPJ):';
-        input.placeholder = '00.000.000/0001-00';
+
+        label.innerText =
+            'Chave Pix (CNPJ):';
+
+        input.placeholder =
+            '00.000.000/0001-00';
+
     } else if (tipo === 'EMAIL') {
-        label.innerText = 'Chave Pix (E-mail):';
-        input.placeholder = 'seuemail@exemplo.com';
+
+        label.innerText =
+            'Chave Pix (E-mail):';
+
+        input.placeholder =
+            'seuemail@exemplo.com';
+
     } else if (tipo === 'EVP') {
-        label.innerText = 'Chave Aleatória (EVP):';
-        input.placeholder = '00000000-0000-0000-0000-000000000000';
+
+        label.innerText =
+            'Chave Aleatória (EVP):';
+
+        input.placeholder =
+            '00000000-0000-0000-0000-000000000000';
     }
 }
 
 async function solicitarPersistencia() {
-    if (navigator.storage && navigator.storage.persist) {
-        const isPersisted = await navigator.storage.persisted();
+
+    if (
+        navigator.storage &&
+        navigator.storage.persist
+    ) {
+
+        const isPersisted =
+            await navigator.storage.persisted();
+
         if (!isPersisted) {
             await navigator.storage.persist();
         }
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-    await iniciarBanco();
-    carregarDados();
-    solicitarPersistencia();
+document.addEventListener(
+    'DOMContentLoaded',
+    async function() {
 
-    document.getElementById('chave').addEventListener('input', (e) => salvarDado('chave', e.target.value));
-    document.getElementById('nome').addEventListener('input', (e) => salvarDado('nome', e.target.value));
-    document.getElementById('cidade').addEventListener('input', (e) => salvarDado('cidade', e.target.value));
-});
+        await iniciarBanco();
 
-// Formatação do Valor
-document.getElementById('valor').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (!value) {
-        e.target.value = '';
-        return;
+        carregarDados();
+
+        solicitarPersistencia();
+
+        document
+            .getElementById('chave')
+            .addEventListener('input', (e) =>
+                salvarDado('chave', e.target.value)
+            );
+
+        document
+            .getElementById('nome')
+            .addEventListener('input', (e) =>
+                salvarDado('nome', e.target.value)
+            );
+
+        document
+            .getElementById('cidade')
+            .addEventListener('input', (e) =>
+                salvarDado('cidade', e.target.value)
+            );
     }
-    let options = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    let result = (parseInt(value, 10) / 100).toLocaleString('pt-BR', options);
-    e.target.value = result;
-});
+);
 
+// ============================================================
+// FORMATAÇÃO DO VALOR
+// ============================================================
+
+document
+    .getElementById('valor')
+    .addEventListener('input', function(e) {
+
+        let value =
+            e.target.value.replace(/\D/g, '');
+
+        if (!value) {
+
+            e.target.value = '';
+
+            return;
+        }
+
+        let options = {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        };
+
+        let result =
+            (
+                parseInt(value, 10) / 100
+            ).toLocaleString(
+                'pt-BR',
+                options
+            );
+
+        e.target.value = result;
+    });
+
+// ============================================================
 // CRC16 CCITT-FALSE
-function CRC16(str) {
-    let crc = 0xFFFF;
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(str);
+// ============================================================
 
-    for (let c = 0; c < bytes.length; c++) {
+function CRC16(str) {
+
+    let crc = 0xFFFF;
+
+    const encoder =
+        new TextEncoder();
+
+    const bytes =
+        encoder.encode(str);
+
+    for (
+        let c = 0;
+        c < bytes.length;
+        c++
+    ) {
+
         crc ^= bytes[c] << 8;
-        for (let i = 0; i < 8; i++) {
-            if ((crc & 0x8000) !== 0) {
-                crc = (crc << 1) ^ 0x1021;
+
+        for (
+            let i = 0;
+            i < 8;
+            i++
+        ) {
+
+            if (
+                (crc & 0x8000) !== 0
+            ) {
+
+                crc =
+                    (crc << 1) ^ 0x1021;
+
             } else {
-                crc = crc << 1;
+
+                crc =
+                    crc << 1;
             }
         }
     }
-    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+
+    return (
+        (crc & 0xFFFF)
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0')
+    );
 }
 
+// ============================================================
+// FORMATA CAMPO EMV
+// ============================================================
+
 function formatField(id, value) {
-    const encoder = new TextEncoder();
-    const len = encoder.encode(value).length.toString().padStart(2, '0');
+
+    const encoder =
+        new TextEncoder();
+
+    const len =
+        encoder
+            .encode(value)
+            .length
+            .toString()
+            .padStart(2, '0');
+
     return id + len + value;
 }
 
+// ============================================================
+// LIMPEZA DE TEXTO
+// ============================================================
+
 function limparTexto(texto) {
+
     if (!texto) return '';
-    let t = texto.replace(/&/g, 'E');
-    t = t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    t = t.replace(/[^a-zA-Z0-9 ]/g, "");
-    return t.trim().toUpperCase();
+
+    let t =
+        texto.replace(/&/g, 'E');
+
+    t =
+        t.normalize("NFD")
+         .replace(/[\u0300-\u036f]/g, '');
+
+    t =
+        t.replace(
+            /[^a-zA-Z0-9 ]/g,
+            ''
+        );
+
+    return t
+        .trim()
+        .toUpperCase();
 }
 
-function tratarChavePixPorTipo(chaveBruta, tipo) {
-    if (!chaveBruta) return '';
-    let c = chaveBruta.trim();
+// ============================================================
+// TRATAMENTO DA CHAVE PIX
+// ============================================================
 
-    if (tipo === 'EMAIL' || tipo === 'EVP') {
-        return c.toLowerCase().trim();
+function tratarChavePixPorTipo(
+    chaveBruta,
+    tipo
+) {
+
+    if (!chaveBruta) return '';
+
+    let c =
+        chaveBruta.trim();
+
+    if (
+        tipo === 'EMAIL' ||
+        tipo === 'EVP'
+    ) {
+
+        return c
+            .toLowerCase()
+            .trim();
     }
 
-    let apenasNumeros = c.replace(/\D/g, '');
+    let apenasNumeros =
+        c.replace(/\D/g, '');
 
-    if (tipo === 'CPF' || tipo === 'CNPJ') {
+    if (
+        tipo === 'CPF' ||
+        tipo === 'CNPJ'
+    ) {
+
         return apenasNumeros;
     }
 
     if (tipo === 'CELULAR') {
+
         if (c.startsWith('+55')) {
-            return '+55' + apenasNumeros.substring(2);
+
+            return (
+                '+55' +
+                apenasNumeros.substring(2)
+            );
         }
-        if ((apenasNumeros.length === 12 || apenasNumeros.length === 13) && apenasNumeros.startsWith('55')) {
-            return '+' + apenasNumeros;
+
+        if (
+            (
+                apenasNumeros.length === 12 ||
+                apenasNumeros.length === 13
+            ) &&
+            apenasNumeros.startsWith('55')
+        ) {
+
+            return '+' +
+                apenasNumeros;
+
         }
-        return '+55' + apenasNumeros;
+
+        return '+55' +
+            apenasNumeros;
     }
 
     return c;
 }
 
-function gerarPix() {
-    let tipo = document.getElementById('tipoChave').value || localStorage.getItem('pix_perm_tipoChave') || 'CELULAR';
-    let chaveBruta = document.getElementById('chave').value || localStorage.getItem('pix_perm_chave') || '';
-    let nomeOriginal = document.getElementById('nome').value || localStorage.getItem('pix_perm_nome') || '';
-    let cidadeOriginal = document.getElementById('cidade').value || localStorage.getItem('pix_perm_cidade') || '';
-    let valorInput = document.getElementById('valor').value;
+// ============================================================
+// GERAÇÃO DO PIX
+// ============================================================
 
-    let chave = tratarChavePixPorTipo(chaveBruta, tipo);
-    let nome = limparTexto(nomeOriginal).substring(0, 25);
-    let cidade = limparTexto(cidadeOriginal).substring(0, 15);
+function gerarPix() {
+
+    let tipo =
+        document.getElementById('tipoChave').value ||
+        localStorage.getItem('pix_perm_tipoChave') ||
+        'CELULAR';
+
+    let chaveBruta =
+        document.getElementById('chave').value ||
+        localStorage.getItem('pix_perm_chave') ||
+        '';
+
+    let nomeOriginal =
+        document.getElementById('nome').value ||
+        localStorage.getItem('pix_perm_nome') ||
+        '';
+
+    let cidadeOriginal =
+        document.getElementById('cidade').value ||
+        localStorage.getItem('pix_perm_cidade') ||
+        '';
+
+    let valorInput =
+        document.getElementById('valor').value;
+
+    let chave =
+        tratarChavePixPorTipo(
+            chaveBruta,
+            tipo
+        );
+
+    let nome =
+        limparTexto(nomeOriginal)
+            .substring(0, 25);
+
+    let cidade =
+        limparTexto(cidadeOriginal)
+            .substring(0, 15);
 
     if (!chave || !nome || !cidade) {
-        alert('Por favor, preencha todos os dados do recebedor (Chave, Nome e Cidade).');
-        document.getElementById('config-box').style.display = 'block';
-        document.getElementById('btn-alterar-texto').innerText = 'Cancelar';
+
+        alert(
+            'Por favor, preencha todos os dados do recebedor (Chave, Nome e Cidade).'
+        );
+
+        document.getElementById(
+            'config-box'
+        ).style.display = 'block';
+
+        document.getElementById(
+            'btn-alterar-texto'
+        ).innerText = 'Cancelar';
+
         return;
     }
 
-    let payload = formatField('00', '01');
+    /*
+     * ========================================================
+     * PIX ESTÁTICO
+     * ========================================================
+     *
+     * IMPORTANTE:
+     *
+     * Não colocamos o campo BR Code 01 = 12 aqui.
+     *
+     * O QR é estático porque a chave Pix fica diretamente
+     * dentro do Merchant Account Information (campo 26).
+     *
+     * Estrutura:
+     *
+     * 00 = Payload Format Indicator
+     * 26 = Merchant Account Information
+     * 52 = Merchant Category Code
+     * 53 = Moeda
+     * 54 = Valor (quando informado)
+     * 58 = País
+     * 59 = Nome
+     * 60 = Cidade
+     * 62 = Dados adicionais / TXID
+     * 63 = CRC16
+     * ========================================================
+     */
 
-    // CORREÇÃO APLICADA: 'br.gov.bcb.pix' agora está estritamente em minúsculo para ativar o WhatsApp
-    let merchantAccount = formatField('00', 'br.gov.bcb.pix') + formatField('01', chave);
-    payload += formatField('26', merchantAccount);
+    let payload =
+        formatField('00', '01');
 
-    payload += formatField('52', '0000') + formatField('53', '986');
+    /*
+     * GUI oficial do Pix.
+     *
+     * A chave Pix fica no subcampo 01.
+     */
+    let merchantAccount =
+        formatField(
+            '00',
+            'br.gov.bcb.pix'
+        ) +
+        formatField(
+            '01',
+            chave
+        );
 
+    payload +=
+        formatField(
+            '26',
+            merchantAccount
+        );
+
+    /*
+     * Merchant Category Code
+     */
+    payload +=
+        formatField(
+            '52',
+            '0000'
+        );
+
+    /*
+     * Moeda brasileira - BRL
+     */
+    payload +=
+        formatField(
+            '53',
+            '986'
+        );
+
+    /*
+     * Valor
+     */
     if (valorInput) {
-        let valorTratado = valorInput.replace(/\./g, '').replace(',', '.').trim();
-        let valorNum = parseFloat(valorTratado);
-        if (!isNaN(valorNum) && valorNum > 0) {
-            payload += formatField('54', valorNum.toFixed(2));
+
+        let valorTratado =
+            valorInput
+                .replace(/\./g, '')
+                .replace(',', '.')
+                .trim();
+
+        let valorNum =
+            parseFloat(valorTratado);
+
+        if (
+            !isNaN(valorNum) &&
+            valorNum > 0
+        ) {
+
+            payload +=
+                formatField(
+                    '54',
+                    valorNum.toFixed(2)
+                );
         }
     }
 
-    payload += formatField('58', 'BR') + 
-               formatField('59', nome) + 
-               formatField('60', cidade);
+    /*
+     * País
+     */
+    payload +=
+        formatField(
+            '58',
+            'BR'
+        );
 
-    let txidAleatorio = 'QR' + Math.random().toString(36).substring(2, 10).toUpperCase();
-    let txidField = formatField('05', txidAleatorio);
-    payload += formatField('62', txidField);
+    /*
+     * Nome do recebedor
+     */
+    payload +=
+        formatField(
+            '59',
+            nome
+        );
 
+    /*
+     * Cidade
+     */
+    payload +=
+        formatField(
+            '60',
+            cidade
+        );
+
+    /*
+     * TXID / Reference Label
+     *
+     * Mantemos um identificador diferente para cada cobrança.
+     * Ele não é o campo 01=12.
+     */
+    let txidAleatorio =
+        'QR' +
+        Math.random()
+            .toString(36)
+            .substring(2, 10)
+            .toUpperCase();
+
+    let txidField =
+        formatField(
+            '05',
+            txidAleatorio
+        );
+
+    payload +=
+        formatField(
+            '62',
+            txidField
+        );
+
+    /*
+     * Campo CRC
+     */
     payload += '6304';
 
-    const crc = CRC16(payload);
-    const pixCompleto = payload + crc;
+    const crc =
+        CRC16(payload);
 
-    const resultBox = document.getElementById('result');
-    resultBox.style.display = 'block';
+    const pixCompleto =
+        payload + crc;
 
-    document.getElementById('pix-payload').value = pixCompleto;
-    const qrContainer = document.getElementById('qrcode-container');
+    /*
+     * Mostra resultado
+     */
+    const resultBox =
+        document.getElementById('result');
+
+    resultBox.style.display =
+        'block';
+
+    document.getElementById(
+        'pix-payload'
+    ).value = pixCompleto;
+
+    /*
+     * Gera QR Code
+     */
+    const qrContainer =
+        document.getElementById(
+            'qrcode-container'
+        );
+
     qrContainer.innerHTML = '';
 
     setTimeout(() => {
-        if (typeof QRCode === 'undefined') {
-            alert('A biblioteca do QR Code não carregou. Verifique sua conexão com a internet e tente novamente.');
+
+        if (
+            typeof QRCode === 'undefined'
+        ) {
+
+            alert(
+                'A biblioteca do QR Code não carregou. Verifique se o arquivo qrcode.min.js está na mesma pasta do index.html.'
+            );
+
             return;
         }
 
-        new QRCode(qrContainer, { 
-            text: pixCompleto, 
-            width: 180, 
-            height: 180,
-            correctLevel: QRCode.CorrectLevel.M
-        });
+        new QRCode(
+            qrContainer,
+            {
+                text: pixCompleto,
+                width: 180,
+                height: 180,
+                correctLevel:
+                    QRCode.CorrectLevel.M
+            }
+        );
+
     }, 50);
 }
 
-function mostrarAviso(mensagemPersonalizada) {
-    const toast = document.getElementById('toast');
-    const btn = document.getElementById('btn-copiar');
-    
-    toast.innerText = mensagemPersonalizada || '✓ Código Pix copiado!';
-    toast.classList.add('show');
-    btn.innerText = '✓ Código Copiado!';
-    btn.style.backgroundColor = '#06b6d4';
-    btn.style.color = '#0f172a';
+// ============================================================
+// AVISO DE CÓPIA
+// ============================================================
 
-    setTimeout(function() {
-        toast.classList.remove('show');
-        btn.innerText = 'Copiar Código Pix';
-        btn.style.backgroundColor = '#2563eb';
-        btn.style.color = '#ffffff';
-    }, 2200);
+function mostrarAviso(
+    mensagemPersonalizada
+) {
+
+    const toast =
+        document.getElementById(
+            'toast'
+        );
+
+    const btn =
+        document.getElementById(
+            'btn-copiar'
+        );
+
+    toast.innerText =
+        mensagemPersonalizada ||
+        '✓ Código Pix copiado!';
+
+    toast.classList.add('show');
+
+    btn.innerText =
+        '✓ Código Copiado!';
+
+    btn.style.backgroundColor =
+        '#06b6d4';
+
+    btn.style.color =
+        '#0f172a';
+
+    setTimeout(
+        function() {
+
+            toast.classList.remove(
+                'show'
+            );
+
+            btn.innerText =
+                'Copiar Código Pix';
+
+            btn.style.backgroundColor =
+                '#2563eb';
+
+            btn.style.color =
+                '#ffffff';
+
+        },
+        2200
+    );
 }
 
-async function copiarParaClipboardAssincrono(texto) {
-    if (navigator.clipboard && window.isSecureContext) {
+// ============================================================
+// CLIPBOARD
+// ============================================================
+
+async function copiarParaClipboardAssincrono(
+    texto
+) {
+
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+
         try {
-            await navigator.clipboard.writeText(texto);
+
+            await navigator.clipboard.writeText(
+                texto
+            );
+
             return true;
+
         } catch (err) {
+
             return false;
         }
     }
+
     return false;
 }
 
-function copiarPix(silencioso = false) {
-    const payloadInput = document.getElementById('pix-payload');
-    const texto = payloadInput ? payloadInput.value.trim() : '';
+function copiarPix(
+    silencioso = false
+) {
+
+    const payloadInput =
+        document.getElementById(
+            'pix-payload'
+        );
+
+    const texto =
+        payloadInput
+            ? payloadInput.value.trim()
+            : '';
+
     if (!texto) return;
 
     payloadInput.focus();
     payloadInput.select();
 
-    copiarParaClipboardAssincrono(texto).then((sucesso) => {
+    copiarParaClipboardAssincrono(
+        texto
+    ).then((sucesso) => {
+
         if (!sucesso) {
+
             try {
-                document.execCommand('copy');
+                document.execCommand(
+                    'copy'
+                );
             } catch (e) {}
         }
-        if (!silencioso) mostrarAviso();
+
+        if (!silencioso) {
+            mostrarAviso();
+        }
     });
 }
 
-// --- ENVIO EM 2 ETAPAS ---
+// ============================================================
+// ENVIO PARA WHATSAPP
+// ============================================================
+
 async function enviarWhatsApp() {
-    const payloadInput = document.getElementById('pix-payload');
-    const pixCode = payloadInput ? payloadInput.value.trim() : '';
+
+    const payloadInput =
+        document.getElementById(
+            'pix-payload'
+        );
+
+    const pixCode =
+        payloadInput
+            ? payloadInput.value.trim()
+            : '';
 
     if (!pixCode) {
-        alert('Gere o código Pix antes de enviar!');
+
+        alert(
+            'Gere o código Pix antes de enviar!'
+        );
+
         return;
     }
 
-    const copiado = await copiarParaClipboardAssincrono(pixCode);
+    const copiado =
+        await copiarParaClipboardAssincrono(
+            pixCode
+        );
+
     if (!copiado) {
+
         try {
+
             payloadInput.focus();
             payloadInput.select();
-            document.execCommand('copy');
+
+            document.execCommand(
+                'copy'
+            );
+
         } catch (e) {}
     }
 
-    mostrarAviso('✓ Pix copiado! Cole a chave após enviar o resumo.');
+    mostrarAviso(
+        '✓ Pix copiado! Cole a chave após enviar o resumo.'
+    );
 
-    const nome = localStorage.getItem('pix_perm_nome') || document.getElementById('nome').value || 'Recebedor';
-    const valor = document.getElementById('valor').value || '0,00';
+    const nome =
+        localStorage.getItem(
+            'pix_perm_nome'
+        ) ||
+        document.getElementById(
+            'nome'
+        ).value ||
+        'Recebedor';
 
-    const mensagemResumo = `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
-                           `👤 *Recebedor:* ${nome}\n` +
-                           `💵 *Valor:* R$ ${valor}\n\n` +
-                           `👇 O código Pix *cópia e cola* abaixo:`;
+    const valor =
+        document.getElementById(
+            'valor'
+        ).value ||
+        '0,00';
 
-    const params = new URLSearchParams();
-    params.append('text', mensagemResumo);
-    const urlFinal = `https://api.whatsapp.com/send?${params.toString()}`;
+    const mensagemResumo =
+        `💠 *DADOS PARA PAGAMENTO VIA PIX*\n\n` +
+        `👤 *Recebedor:* ${nome}\n` +
+        `💵 *Valor:* R$ ${valor}\n\n` +
+        `👇 O código Pix *cópia e cola* abaixo:`;
+
+    const params =
+        new URLSearchParams();
+
+    params.append(
+        'text',
+        mensagemResumo
+    );
+
+    const urlFinal =
+        `https://api.whatsapp.com/send?${params.toString()}`;
 
     setTimeout(() => {
-        window.location.href = urlFinal;
+
+        window.location.href =
+            urlFinal;
+
     }, 200);
 }
 
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').catch(function(err) {});
-    });
+
+    window.addEventListener(
+        'load',
+        function() {
+
+            navigator.serviceWorker
+                .register('./sw.js')
+                .catch(
+                    function(err) {}
+                );
+        }
+    );
 }
 
+// ============================================================
+// INSTALAÇÃO DO PWA
+// ============================================================
+
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById('btn-instalar').style.display = 'block';
-});
 
-document.getElementById('btn-instalar').addEventListener('click', (e) => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+window.addEventListener(
+    'beforeinstallprompt',
+    (e) => {
+
+        e.preventDefault();
+
+        deferredPrompt = e;
+
+        document.getElementById(
+            'btn-instalar'
+        ).style.display = 'block';
     }
-});
-</script>
+);
 
-</body>
+document
+    .getElementById('btn-instalar')
+    .addEventListener(
+        'click',
+        (e) => {
+
+            if (deferredPrompt) {
+
+                deferredPrompt.prompt();
+
+                deferredPrompt.userChoice
+                    .then(() => {
+
+                        deferredPrompt =
+                            null;
+                    });
+            }
+        }
+    );
+
+</script></body>
 </html>
