@@ -242,7 +242,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Qr<span class="pix-color">Pix</span></h1>
+            <h1>QR <span class="pix-color">Pix</span></h1>
         </div>
 
         <!-- Resumo Sutil do Recebedor -->
@@ -651,7 +651,6 @@
             payload += formatField('60', cidade);
 
             // TXID
-            // Sem TXID específico: utiliza ***
             payload += formatField('62', formatField('05', '***'));
 
             // CRC16
