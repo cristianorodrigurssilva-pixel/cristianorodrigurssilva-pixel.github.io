@@ -1,6 +1,6 @@
 {
-  "name": "QrPix",
-  "short_name": "QrPix",
+  "name": "QR Pix",
+  "short_name": "QR Pix",
   "description": "Gerador de QR Code Pix",
   "start_url": "./",
   "scope": "./",
